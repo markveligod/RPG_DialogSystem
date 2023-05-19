@@ -82,6 +82,9 @@ public:
     /** @public Node search by index **/
     FRPG_DialogNode* FindNodeByIndex(int32 IndexNode);
 
+    /** @public Find start node **/
+    FRPG_DialogNode* FindStartNode();
+
 #if WITH_EDITOR
 
 public:

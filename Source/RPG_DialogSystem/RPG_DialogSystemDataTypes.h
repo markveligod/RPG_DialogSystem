@@ -21,13 +21,13 @@ struct FRPG_DialogNode
     int32 IndexNode{INDEX_NONE};
 
     UPROPERTY(EditAnywhere)
-    FVector2D NodePosition;
+    FVector2D NodePosition{FVector2D::UnitVector};
 
     UPROPERTY(EditAnywhere)
     ERPG_TypeStateDialog TypeStateDialog{ERPG_TypeStateDialog::None};
 
     UPROPERTY(EditAnywhere)
-    FText TextDialog;
+    URPG_DialogConditionObject* DialogConditionObject{nullptr};
 
     UPROPERTY(EditAnywhere)
     TArray<int32> OutNodes;

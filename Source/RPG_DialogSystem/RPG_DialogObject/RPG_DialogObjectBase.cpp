@@ -2,6 +2,8 @@
 
 
 #include "RPG_DialogObject/RPG_DialogObjectBase.h"
+
+#include "Condition/RPG_DialogConditionObject.h"
 #include "Net/UnrealNetwork.h"
 #include "RPG_Library/RPG_DialogFunctionLibrary.h"
 
@@ -84,6 +86,14 @@ FRPG_DialogNode* URPG_DialogObjectBase::FindNodeByIndex(int32 IndexNode)
     });
 }
 
+FRPG_DialogNode* URPG_DialogObjectBase::FindStartNode()
+{
+    return ArrayDialogNode.FindByPredicate([](const FRPG_DialogNode& Data)
+    {
+        return Data.TypeStateDialog == ERPG_TypeStateDialog::Entry;
+    });
+}
+
 FRPG_DialogNode* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
 {
     const int32 FreeNumber = GetFreeIndexNumSlot();
@@ -93,7 +103,11 @@ FRPG_DialogNode* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeState
     NewNode.IndexNode = FreeNumber;
     NewNode.NodePosition = NodePosition;
     NewNode.TypeStateDialog = TypeStateDialog;
-    NewNode.TextDialog = FText::FromString(FString::Printf(TEXT("Example Text #%i"), FreeNumber));
+    NewNode.DialogConditionObject = NewObject<URPG_DialogConditionObject>(this, URPG_DialogConditionObject::StaticClass(), NAME_None, RF_Transactional);
+    if (NewNode.DialogConditionObject)
+    {
+        NewNode.DialogConditionObject->SetupNewTextDialog(FText::FromString(FString::Printf(TEXT("Example Text #%i"), FreeNumber)));
+    }
 
     ArrayDialogNode.AddUnique(NewNode);
     return FindNodeByIndex(FreeNumber);
