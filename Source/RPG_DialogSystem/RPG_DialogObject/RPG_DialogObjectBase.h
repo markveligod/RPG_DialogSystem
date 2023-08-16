@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "RPG_DialogSystemDataTypes.h"
+#include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
 #include "RPG_DialogObjectBase.generated.h"
 
 /**
@@ -13,15 +13,14 @@
 UCLASS()
 class RPG_DIALOGSYSTEM_API URPG_DialogObjectBase : public UObject
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 #pragma region Default
 
 public:
-
     /** @public Initialization of internal parameters **/
     virtual bool InitDialog(APlayerController* PlayerController);
-    
+
     /**
      * Handles reading, writing, and reference collecting using FArchive.
      * This implementation handles all FProperty serialization, but can be overridden for native variables.
@@ -63,7 +62,6 @@ public:
 #pragma region Action
 
 public:
-
     /** @public Node search by index **/
     FRPG_DialogNode* FindNodeByIndex(int32 IndexNode);
 
@@ -73,12 +71,10 @@ public:
 #if WITH_EDITOR
 
 public:
-
     /** @public Creating a new dialog node **/
     FRPG_DialogNode* CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition);
 
 private:
-    
     /** @private Search for a free number index **/
     int32 GetFreeIndexNumSlot() const;
 
@@ -89,7 +85,6 @@ private:
 #pragma region DataDialog
 
 private:
-
     /** @private Array of dialog nodes **/
     UPROPERTY(SaveGame, Replicated)
     TArray<FRPG_DialogNode> ArrayDialogNode;

@@ -18,6 +18,11 @@
 		{
 			"Name": "RPG_DialogSystem",
 			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "RPG_DialogSystemEditor",
+			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
 	]

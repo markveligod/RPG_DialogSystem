@@ -6,8 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "RPG_DialogComponentBase.generated.h"
 
-
-UCLASS(ClassGroup=(Managers))
+UCLASS(ClassGroup = (Managers))
 class RPG_DIALOGSYSTEM_API URPG_DialogComponentBase : public UActorComponent
 {
     GENERATED_BODY()
@@ -23,6 +22,4 @@ protected:
 public:
     // Called every frame
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-
 };

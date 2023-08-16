@@ -7,7 +7,7 @@
 #include "RPG_DialogSettingsObject.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(DisplayName = "DialogEvent", EditInlineNew)
 class RPG_DIALOGSYSTEM_API URPG_DialogConditionEvent : public UObject
@@ -17,11 +17,9 @@ class RPG_DIALOGSYSTEM_API URPG_DialogConditionEvent : public UObject
 #pragma region ActionDialogEvent
 
 public:
-
     virtual void TriggerCondition();
 
 protected:
-
     UFUNCTION(BlueprintImplementableEvent)
     void TriggerCondition_Event();
 
@@ -29,7 +27,7 @@ protected:
 };
 
 /**
- * 
+ *
  */
 UCLASS(DisplayName = "DialogTask", EditInlineNew)
 class RPG_DIALOGSYSTEM_API URPG_DialogConditionTask : public UObject
@@ -39,30 +37,26 @@ class RPG_DIALOGSYSTEM_API URPG_DialogConditionTask : public UObject
 #pragma region ActionDialogTask
 
 public:
-
     virtual bool IsConditionTask();
 
 protected:
-
     UFUNCTION(BlueprintNativeEvent)
     bool IsConditionTask_Event();
 
 #pragma endregion
-    
 };
 
 /**
- * 
+ *
  */
 UCLASS()
 class RPG_DIALOGSYSTEM_API URPG_DialogSettingsObject : public UObject
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 #pragma region ActionDialog
 
 public:
-
     UFUNCTION(BlueprintCallable)
     void SetupNewTextDialog(const FText& NewText) { TextDialog = NewText; }
 
@@ -74,7 +68,6 @@ public:
 #pragma region DataDialog
 
 private:
-
     UPROPERTY(EditAnywhere)
     FText TextDialog;
 

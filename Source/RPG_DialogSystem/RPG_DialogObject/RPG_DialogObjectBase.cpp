@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "Condition/RPG_DialogSettingsObject.h"
 #include "Net/UnrealNetwork.h"
@@ -59,18 +58,12 @@ void URPG_DialogObjectBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 FRPG_DialogNode* URPG_DialogObjectBase::FindNodeByIndex(int32 IndexNode)
 {
-    return ArrayDialogNode.FindByPredicate([IndexNode](const FRPG_DialogNode& Data)
-    {
-        return Data.IndexNode == IndexNode;
-    });
+    return ArrayDialogNode.FindByPredicate([IndexNode](const FRPG_DialogNode& Data) { return Data.IndexNode == IndexNode; });
 }
 
 FRPG_DialogNode* URPG_DialogObjectBase::FindStartNode()
 {
-    return ArrayDialogNode.FindByPredicate([](const FRPG_DialogNode& Data)
-    {
-        return Data.TypeStateDialog == ERPG_TypeStateDialog::Entry;
-    });
+    return ArrayDialogNode.FindByPredicate([](const FRPG_DialogNode& Data) { return Data.TypeStateDialog == ERPG_TypeStateDialog::Entry; });
 }
 
 FRPG_DialogNode* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)

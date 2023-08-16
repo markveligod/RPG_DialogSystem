@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 
 #pragma region ActionDialogEvent
@@ -25,5 +24,3 @@ bool URPG_DialogConditionTask::IsConditionTask_Event_Implementation()
 }
 
 #pragma endregion
-
-

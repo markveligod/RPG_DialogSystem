@@ -8,7 +8,7 @@
 #include "RPG_DialogFunctionLibrary.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class RPG_DIALOGSYSTEM_API URPG_DialogFunctionLibrary : public UBlueprintFunctionLibrary
@@ -16,5 +16,4 @@ class RPG_DIALOGSYSTEM_API URPG_DialogFunctionLibrary : public UBlueprintFunctio
     GENERATED_BODY()
 
 public:
-
 };
