@@ -2,36 +2,15 @@
 
 
 #include "RPG_DialogObject/RPG_DialogObjectBase.h"
-
-#include "Condition/RPG_DialogConditionObject.h"
+#include "Condition/RPG_DialogSettingsObject.h"
 #include "Net/UnrealNetwork.h"
-#include "RPG_Library/RPG_DialogFunctionLibrary.h"
-
-#pragma region Log
-
-void URPG_DialogObjectBase::Print_LogQuest(const TEnumAsByte<ELogVerbosity::Type> LogVerb, const FString& Text, const int Line, const char* Function) const
-{
-    const FString NetMode = URPG_DialogFunctionLibrary::GetNetModeToString(OwnerPC);
-    const FString Result = FString::Printf(TEXT("NetMode: [%s] | Name quest object: [%s] | Text: [%s]"), *NetMode, *GetName(), *Text);
-    URPG_DialogFunctionLibrary::Print_Log(LogVerb, Result, Line, Function);
-}
-
-bool URPG_DialogObjectBase::Print_CLogQuest(const bool bCond, const TEnumAsByte<ELogVerbosity::Type> LogVerb, const FString& Text, const int Line, const char* Function) const
-{
-    const FString NetMode = URPG_DialogFunctionLibrary::GetNetModeToString(OwnerPC);
-    const FString Result = FString::Printf(TEXT("NetMode: [%s] | Name quest object: [%s] | Text: [%s]"), *NetMode, *GetName(), *Text);
-    return URPG_DialogFunctionLibrary::Print_CLog(bCond, LogVerb, Result, Line, Function);
-}
-
-#pragma endregion
-
 
 #pragma region Default
 
 bool URPG_DialogObjectBase::InitDialog(APlayerController* PlayerController)
 {
-    if (DIALOG_OBJECT_CLOG(PlayerController == nullptr, ELogVerbosity::Error, TEXT("Player controller is nullptr"))) return false;
-    
+    if (CLOG_DIALOG_SYSTEM(PlayerController == nullptr, "Player controller is nullptr")) return false;
+
     OwnerPC = PlayerController;
     return true;
 }
@@ -97,13 +76,13 @@ FRPG_DialogNode* URPG_DialogObjectBase::FindStartNode()
 FRPG_DialogNode* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
 {
     const int32 FreeNumber = GetFreeIndexNumSlot();
-    if (DIALOG_OBJECT_CLOG(FreeNumber == INDEX_NONE, ELogVerbosity::Warning, TEXT("Free number is INDEX_NONE"))) return nullptr;
+    if (CLOG_DIALOG_SYSTEM(FreeNumber == INDEX_NONE, "Free number is INDEX_NONE")) return nullptr;
     FRPG_DialogNode NewNode;
 
     NewNode.IndexNode = FreeNumber;
     NewNode.NodePosition = NodePosition;
     NewNode.TypeStateDialog = TypeStateDialog;
-    NewNode.DialogConditionObject = NewObject<URPG_DialogConditionObject>(this, URPG_DialogConditionObject::StaticClass(), NAME_None, RF_Transactional);
+    NewNode.DialogConditionObject = NewObject<URPG_DialogSettingsObject>(this, URPG_DialogSettingsObject::StaticClass(), NAME_None, RF_Transactional);
     if (NewNode.DialogConditionObject)
     {
         NewNode.DialogConditionObject->SetupNewTextDialog(FText::FromString(FString::Printf(TEXT("Example Text #%i"), FreeNumber)));

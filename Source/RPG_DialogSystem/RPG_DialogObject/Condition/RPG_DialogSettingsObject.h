@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "RPG_DialogConditionObject.generated.h"
+#include "RPG_DialogSettingsObject.generated.h"
 
 /**
  * 
@@ -55,7 +55,7 @@ protected:
  * 
  */
 UCLASS()
-class RPG_DIALOGSYSTEM_API URPG_DialogConditionObject : public UObject
+class RPG_DIALOGSYSTEM_API URPG_DialogSettingsObject : public UObject
 {
 	GENERATED_BODY()
 

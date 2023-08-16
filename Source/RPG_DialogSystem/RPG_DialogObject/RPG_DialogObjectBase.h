@@ -15,21 +15,6 @@ class RPG_DIALOGSYSTEM_API URPG_DialogObjectBase : public UObject
 {
 	GENERATED_BODY()
 
-#pragma region Log
-
-protected:
-#define DIALOG_OBJECT_LOG(LogVerb, Text) Print_LogQuest(LogVerb, Text, __LINE__, __FUNCTION__)
-#define DIALOG_OBJECT_CLOG(Cond, LogVerb, Text) Print_CLogQuest(Cond, LogVerb, Text, __LINE__, __FUNCTION__)
-
-    /** @protected Write a log **/
-    void Print_LogQuest(const TEnumAsByte<ELogVerbosity::Type> LogVerb, const FString& Text, const int Line, const char* Function) const;
-
-    /** @protected Write a clog **/
-    bool Print_CLogQuest(const bool bCond, const TEnumAsByte<ELogVerbosity::Type> LogVerb, const FString& Text, const int Line, const char* Function) const;
-
-#pragma endregion
-
-
 #pragma region Default
 
 public:
