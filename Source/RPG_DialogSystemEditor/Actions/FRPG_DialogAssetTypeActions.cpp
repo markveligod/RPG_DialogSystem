@@ -1,7 +1,7 @@
 ﻿#include "FRPG_DialogAssetTypeActions.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogSystemEditor/RPG_DialogSystemEditor.h"
-#include "RPG_DialogSystemEditor/Editor/FRPG_DialogAssetEditor.h"
+#include "..\Editor\RPG_DialogAssetEditor.h"
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
 

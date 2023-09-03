@@ -14,5 +14,11 @@ class RPG_DIALOGSYSTEMEDITOR_API URPG_DialogEdGraphSchema : public UEdGraphSchem
 {
     GENERATED_BODY()
 
+public:
+    //~ Begin EdGraphSchema Interface
+    virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
+    virtual void GetContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
+    //~ End EdGraphSchema Interface
+
 
 };

@@ -56,6 +56,8 @@ protected:
     void OnSelectedNodesChanged(const TSet<UObject*>& Nodes);
     void OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged);
 
+    void CreateNPCNode();
+    void CreatePlayerNode();
 private:
     /** The object we're currently editing */
     URPG_DialogObjectBase* DialogBeingEdited{nullptr};

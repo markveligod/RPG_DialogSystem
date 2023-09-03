@@ -1,4 +1,4 @@
-﻿#include "FRPG_DialogAssetEditor.h"
+﻿#include "RPG_DialogAssetEditor.h"
 
 #include "Graph/RPG_DialogEdGraphSchema.h"
 #include "Graph/RPG_DialogGraph.h"
@@ -145,6 +145,7 @@ FString FRPG_DialogAssetEditor::GetReferencerName() const
 
 void FRPG_DialogAssetEditor::BindGraphCommands()
 {
+    
 }
 
 void FRPG_DialogAssetEditor::InitDialogEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, URPG_DialogObjectBase* InitDialogObject)
@@ -228,6 +229,14 @@ void FRPG_DialogAssetEditor::OnSelectedNodesChanged(const TSet<UObject*>& Nodes)
 }
 
 void FRPG_DialogAssetEditor::OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged)
+{
+}
+
+void FRPG_DialogAssetEditor::CreateNPCNode()
+{
+}
+
+void FRPG_DialogAssetEditor::CreatePlayerNode()
 {
 }
 
