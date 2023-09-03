@@ -1,6 +1,7 @@
 ﻿#include "FRPG_DialogAssetTypeActions.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogSystemEditor/RPG_DialogSystemEditor.h"
+#include "RPG_DialogSystemEditor/Editor/FRPG_DialogAssetEditor.h"
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
 
@@ -27,8 +28,10 @@ void FRPG_DialogAssetTypeActions::OpenAssetEditor(const TArray<UObject*>& InObje
 
     for (auto ObjIt = InObjects.CreateConstIterator(); ObjIt; ++ObjIt)
     {
-        if (URPG_DialogObjectBase* Quest = Cast<URPG_DialogObjectBase>(*ObjIt))
+        if (URPG_DialogObjectBase* Dialog = Cast<URPG_DialogObjectBase>(*ObjIt))
         {
+            TSharedRef<FRPG_DialogAssetEditor> NewDialogAssetEditor(new FRPG_DialogAssetEditor());
+            NewDialogAssetEditor->InitDialogEditor(Mode, EditWithinLevelEditor, Dialog);
         }
     }
 }
