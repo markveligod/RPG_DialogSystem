@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
 #include "UObject/NoExportTypes.h"
 #include "RPG_DialogSettingsObject.generated.h"
 
@@ -67,6 +68,24 @@ public:
 
 #pragma region DataDialog
 
+#if WITH_EDITORONLY_DATA
+
+public:
+
+    UPROPERTY(VisibleAnywhere)
+    int32 IndexNode{INDEX_NONE};
+
+    UPROPERTY(VisibleAnywhere)
+    FVector2D NodePosition{FVector2D::UnitVector};
+
+    UPROPERTY(VisibleAnywhere)
+    ERPG_TypeStateDialog TypeStateDialog{ERPG_TypeStateDialog::None};
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<int32> OutNodes;
+
+#endif
+    
 private:
     UPROPERTY(EditAnywhere)
     FText TextDialog;

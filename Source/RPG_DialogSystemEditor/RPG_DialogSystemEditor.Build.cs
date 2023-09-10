@@ -11,6 +11,6 @@ public class RPG_DialogSystemEditor : ModuleRules
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "CoreUObject", "Engine", "Slate", "SlateCore", "RPG_DialogSystem", "EditorStyle", "Engine", "InputCore", "LevelEditor", "Slate",
-            "AssetTools", "KismetWidgets", "WorkspaceMenuStructure", "Projects", "GraphEditor", "AnimGraph", "PropertyEditor", "ToolMenus", "ApplicationCore", "UnrealEd", "Json", "JsonUtilities" });
+            "AssetTools", "KismetWidgets", "WorkspaceMenuStructure", "Projects", "GraphEditor", "AnimGraph", "PropertyEditor", "ToolMenus", "ApplicationCore", "UnrealEd", "Json", "JsonUtilities", "DeveloperSettings" });
     }
 }

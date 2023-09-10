@@ -6,6 +6,19 @@
 
 #pragma region Default
 
+URPG_DialogObjectBase::URPG_DialogObjectBase()
+{
+    if (HasAnyFlags(RF_ClassDefaultObject)) return;
+
+#if UE_EDITOR
+
+    if (!FindStartNode())
+    {
+        CreateNewDialogNode(ERPG_TypeStateDialog::Entry, FVector2D::ZeroVector);
+    }
+#endif
+}
+
 bool URPG_DialogObjectBase::InitDialog(APlayerController* PlayerController)
 {
     if (CLOG_DIALOG_SYSTEM(PlayerController == nullptr, "Player controller is nullptr")) return false;
@@ -56,40 +69,61 @@ void URPG_DialogObjectBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 #pragma region Action
 
-FRPG_DialogNode* URPG_DialogObjectBase::FindNodeByIndex(int32 IndexNode)
+URPG_DialogSettingsObject* URPG_DialogObjectBase::FindNodeByIndex(int32 IndexNode)
 {
-    return ArrayDialogNode.FindByPredicate([IndexNode](const FRPG_DialogNode& Data) { return Data.IndexNode == IndexNode; });
+    const auto FindElem = ArrayDialogNode.FindByPredicate([IndexNode](URPG_DialogSettingsObject* Data)
+    {
+        return Data ? Data->IndexNode == IndexNode : false;
+    });
+    return FindElem ? *FindElem : nullptr;
 }
 
-FRPG_DialogNode* URPG_DialogObjectBase::FindStartNode()
+URPG_DialogSettingsObject* URPG_DialogObjectBase::FindStartNode()
 {
-    return ArrayDialogNode.FindByPredicate([](const FRPG_DialogNode& Data) { return Data.TypeStateDialog == ERPG_TypeStateDialog::Entry; });
+    const auto FindElem = ArrayDialogNode.FindByPredicate([](URPG_DialogSettingsObject* Data)
+    {
+        return Data ? Data->TypeStateDialog == ERPG_TypeStateDialog::Entry : false;
+    });
+    return FindElem ? *FindElem : nullptr;
 }
 
-FRPG_DialogNode* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
+URPG_DialogSettingsObject* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
 {
     const int32 FreeNumber = GetFreeIndexNumSlot();
     if (CLOG_DIALOG_SYSTEM(FreeNumber == INDEX_NONE, "Free number is INDEX_NONE")) return nullptr;
-    FRPG_DialogNode NewNode;
 
-    NewNode.IndexNode = FreeNumber;
-    NewNode.NodePosition = NodePosition;
-    NewNode.TypeStateDialog = TypeStateDialog;
-    NewNode.DialogConditionObject = NewObject<URPG_DialogSettingsObject>(this, URPG_DialogSettingsObject::StaticClass(), NAME_None, RF_Transactional);
-    if (NewNode.DialogConditionObject)
+    URPG_DialogSettingsObject* NewDialogSettingsObject = nullptr;
+    if (TypeStateDialog == ERPG_TypeStateDialog::Entry)
     {
-        NewNode.DialogConditionObject->SetupNewTextDialog(FText::FromString(FString::Printf(TEXT("Example Text #%i"), FreeNumber)));
+        NewDialogSettingsObject = CreateDefaultSubobject<URPG_DialogSettingsObject>(FName("Start Dialog Node"));
+    }
+    else
+    {
+        NewDialogSettingsObject = NewObject<URPG_DialogSettingsObject>(this, URPG_DialogSettingsObject::StaticClass(), NAME_None, RF_Transactional);
     }
 
-    ArrayDialogNode.AddUnique(NewNode);
-    return FindNodeByIndex(FreeNumber);
+    if (NewDialogSettingsObject)
+    {
+        NewDialogSettingsObject->SetFlags(RF_Transactional);
+        NewDialogSettingsObject->IndexNode = FreeNumber;
+        NewDialogSettingsObject->NodePosition = NodePosition;
+        NewDialogSettingsObject->TypeStateDialog = TypeStateDialog;
+        NewDialogSettingsObject->SetupNewTextDialog(FText::FromString(FString::Printf(TEXT("Example Text #%i"), FreeNumber)));
+        ArrayDialogNode.AddUnique(NewDialogSettingsObject);
+        return NewDialogSettingsObject;
+    }
+
+    return nullptr;
 }
 
 int32 URPG_DialogObjectBase::GetFreeIndexNumSlot() const
 {
     for (int32 i = 0; i < INT32_MAX; i++)
     {
-        if (!ArrayDialogNode.ContainsByPredicate([i](const FRPG_DialogNode& Data) { return Data.IndexNode == i; }))
+        if (!ArrayDialogNode.ContainsByPredicate([i](URPG_DialogSettingsObject* Data)
+        {
+            return Data ? Data->IndexNode == i : false;
+        }))
         {
             return i;
         }

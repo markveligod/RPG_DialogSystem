@@ -18,6 +18,9 @@ class RPG_DIALOGSYSTEM_API URPG_DialogObjectBase : public UObject
 #pragma region Default
 
 public:
+
+    URPG_DialogObjectBase();
+    
     /** @public Initialization of internal parameters **/
     virtual bool InitDialog(APlayerController* PlayerController);
 
@@ -63,16 +66,19 @@ public:
 
 public:
     /** @public Node search by index **/
-    FRPG_DialogNode* FindNodeByIndex(int32 IndexNode);
+    URPG_DialogSettingsObject* FindNodeByIndex(int32 IndexNode);
 
     /** @public Find start node **/
-    FRPG_DialogNode* FindStartNode();
+    URPG_DialogSettingsObject* FindStartNode();
+
+    /** @public Get all dialog objects **/
+    const TArray<URPG_DialogSettingsObject*>& GetArrayDialogNode() { return ArrayDialogNode; }
 
 #if WITH_EDITOR
 
 public:
     /** @public Creating a new dialog node **/
-    FRPG_DialogNode* CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition);
+    URPG_DialogSettingsObject* CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition);
 
 private:
     /** @private Search for a free number index **/
@@ -87,7 +93,7 @@ private:
 private:
     /** @private Array of dialog nodes **/
     UPROPERTY(SaveGame, Replicated)
-    TArray<FRPG_DialogNode> ArrayDialogNode;
+    TArray<URPG_DialogSettingsObject*> ArrayDialogNode;
 
     /** @private Owner player controller **/
     UPROPERTY()

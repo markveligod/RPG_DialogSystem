@@ -12,6 +12,7 @@ enum class ERPG_TypeStateDialog : uint8
     Entry,
     NPCNode,
     PlayerNode,
+    Transfer,
 };
 
 USTRUCT(BlueprintType)
@@ -29,7 +30,7 @@ struct FRPG_DialogNode
     ERPG_TypeStateDialog TypeStateDialog{ERPG_TypeStateDialog::None};
 
     UPROPERTY(EditAnywhere)
-    URPG_DialogSettingsObject* DialogConditionObject{nullptr};
+    URPG_DialogSettingsObject* DialogSettingsObject{nullptr};
 
     UPROPERTY(EditAnywhere)
     TArray<int32> OutNodes;

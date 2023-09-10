@@ -3,6 +3,9 @@
 
 #include "RPG_DialogEdGraphSchema.h"
 #include "Actions/RPG_DialogGraphActions.h"
+#include "Nodes/RPG_DialogGraphNode_Base.h"
+#include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
+#include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 
 #define LOCTEXT_NAMESPACE "DialogSchema"
 
@@ -24,6 +27,54 @@ void URPG_DialogEdGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNode
     // For Node
     Super::GetContextMenuActions(Menu, Context);
 
+}
+
+void URPG_DialogEdGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
+{
+    URPG_DialogObjectBase* DialogObject = Cast<URPG_DialogObjectBase>(Graph.GetOuter());
+    if (!DialogObject) return;
+
+    const TArray<URPG_DialogSettingsObject*>& ArrayDialogNode = DialogObject->GetArrayDialogNode();
+    for (const auto* NodeData : ArrayDialogNode)
+    {
+        FGraphNodeCreator<URPG_DialogGraphNode_Base> NodeCreator(Graph);
+        URPG_DialogGraphNode_Base* ResultRootNode = NodeCreator.CreateNode();
+        if (!ResultRootNode) continue;
+
+        ResultRootNode->TargetIndexTaskNode = NodeData->IndexNode;
+        ResultRootNode->NodePosX = NodeData->NodePosition.X;
+        ResultRootNode->NodePosY = NodeData->NodePosition.Y;
+        NodeCreator.Finalize();
+        SetNodeMetaData(ResultRootNode, FNodeMetadata::DefaultGraphNode);
+        ResultRootNode->Modify();
+        ResultRootNode->MarkPackageDirty();
+    }
+
+    AutoConnectNodeByDefault(Graph);
+}
+
+void URPG_DialogEdGraphSchema::AutoConnectNodeByDefault(UEdGraph& Graph) const
+{
+}
+
+const FPinConnectionResponse URPG_DialogEdGraphSchema::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const
+{
+    return Super::CanCreateConnection(A, B);
+}
+
+bool URPG_DialogEdGraphSchema::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const
+{
+    return Super::TryCreateConnection(A, B);
+}
+
+FLinearColor URPG_DialogEdGraphSchema::GetPinTypeColor(const FEdGraphPinType& PinType) const
+{
+    return Super::GetPinTypeColor(PinType);
+}
+
+FLinearColor URPG_DialogEdGraphSchema::GetSecondaryPinTypeColor(const FEdGraphPinType& PinType) const
+{
+    return Super::GetSecondaryPinTypeColor(PinType);
 }
 
 #undef LOCTEXT_NAMESPACE
