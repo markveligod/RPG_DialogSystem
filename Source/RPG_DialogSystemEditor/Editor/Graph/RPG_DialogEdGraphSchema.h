@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraphSchema.h"
+#include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
 #include "RPG_DialogEdGraphSchema.generated.h"
 
 /**
@@ -26,5 +27,5 @@ public:
     virtual FLinearColor GetSecondaryPinTypeColor(const FEdGraphPinType& PinType) const override;
     //~ End EdGraphSchema Interface
 
-
+    virtual UEdGraphNode* CreateStandardNodeForGraph(UEdGraph* Graph, const FVector2D& InLocationNode, ERPG_TypeStateDialog TypeStateDialog) const;
 };

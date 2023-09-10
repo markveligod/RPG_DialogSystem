@@ -21,12 +21,38 @@ void URPG_DialogGraphNode_Base::GetNodeContextMenuActions(UToolMenu* Menu, UGrap
 
 FText URPG_DialogGraphNode_Base::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-    return Super::GetNodeTitle(TitleType);
+    URPG_DialogObjectBase* DialogObject = GetDialogObject();
+    if (!DialogObject) return Super::GetNodeTitle(TitleType);
+
+    const URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    if (!DialogSettingsObject) return Super::GetNodeTitle(TitleType);
+
+    const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
+    if (!DialogSystemConfigEditor) return Super::GetNodeTitle(TitleType);
+
+    const FString NodeTitleText = DialogSystemConfigEditor->NodeTitleText.Contains(DialogSettingsObject->TypeStateDialog) ?
+        DialogSystemConfigEditor->NodeTitleText[DialogSettingsObject->TypeStateDialog] : TEXT("None");
+
+    return FText::FromString(FString::Printf(TEXT("#%i | %s"),
+        DialogSettingsObject->IndexNode, *NodeTitleText));
 }
 
 FText URPG_DialogGraphNode_Base::GetTooltipText() const
 {
-    return Super::GetTooltipText();
+    URPG_DialogObjectBase* DialogObject = GetDialogObject();
+    if (!DialogObject) return Super::GetTooltipText();
+
+    const URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    if (!DialogSettingsObject) return Super::GetTooltipText();
+
+    const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
+    if (!DialogSystemConfigEditor) return Super::GetTooltipText();
+
+    const FString NodeTooltipText = DialogSystemConfigEditor->NodeTooltipText.Contains(DialogSettingsObject->TypeStateDialog) ?
+        DialogSystemConfigEditor->NodeTooltipText[DialogSettingsObject->TypeStateDialog] : TEXT("None");
+
+    return FText::FromString(FString::Printf(TEXT("#%i | %s"),
+        DialogSettingsObject->IndexNode, *NodeTooltipText));
 }
 
 FLinearColor URPG_DialogGraphNode_Base::GetNodeTitleColor() const

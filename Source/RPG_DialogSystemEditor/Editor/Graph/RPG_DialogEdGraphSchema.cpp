@@ -20,6 +20,8 @@ void URPG_DialogEdGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& 
     const TSharedPtr<FRPG_DialogAction_NewPlayerNode> CreatePlayerAction(new FRPG_DialogAction_NewPlayerNode());
     ContextMenuBuilder.AddAction(CreatePlayerAction);
 
+    const TSharedPtr<FRPG_DialogAction_NewTransferNode> CreateTransferAction(new FRPG_DialogAction_NewTransferNode());
+    ContextMenuBuilder.AddAction(CreateTransferAction);
 }
 
 void URPG_DialogEdGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
@@ -75,6 +77,30 @@ FLinearColor URPG_DialogEdGraphSchema::GetPinTypeColor(const FEdGraphPinType& Pi
 FLinearColor URPG_DialogEdGraphSchema::GetSecondaryPinTypeColor(const FEdGraphPinType& PinType) const
 {
     return Super::GetSecondaryPinTypeColor(PinType);
+}
+
+UEdGraphNode* URPG_DialogEdGraphSchema::CreateStandardNodeForGraph(UEdGraph* Graph, const FVector2D& InLocationNode, ERPG_TypeStateDialog TypeStateDialog) const
+{
+    if (!Graph) return nullptr;
+    URPG_DialogObjectBase* DialogObject = Cast<URPG_DialogObjectBase>(Graph->GetOuter());
+    if (!DialogObject) return nullptr;
+
+    if (URPG_DialogSettingsObject* NewDialog = DialogObject->CreateNewDialogNode(TypeStateDialog, InLocationNode))
+    {
+        FGraphNodeCreator<URPG_DialogGraphNode_Base> NodeCreator(*Graph);
+        URPG_DialogGraphNode_Base* ResultRootNode = NodeCreator.CreateNode();
+        if (!ResultRootNode) return nullptr;
+
+        ResultRootNode->TargetIndexTaskNode = NewDialog->IndexNode;
+        ResultRootNode->NodePosX = NewDialog->NodePosition.X;
+        ResultRootNode->NodePosY = NewDialog->NodePosition.Y;
+        NodeCreator.Finalize();
+        SetNodeMetaData(ResultRootNode, FNodeMetadata::DefaultGraphNode);
+        ResultRootNode->Modify();
+        ResultRootNode->MarkPackageDirty();
+        return ResultRootNode;
+    }
+    return nullptr;
 }
 
 #undef LOCTEXT_NAMESPACE

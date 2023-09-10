@@ -27,4 +27,10 @@ public:
 
     UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
     TMap<ERPG_TypeStateDialog, FLinearColor> NodeBodyTintColor;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    TMap<ERPG_TypeStateDialog, FString> NodeTitleText;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    TMap<ERPG_TypeStateDialog, FString> NodeTooltipText;
 };

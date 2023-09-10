@@ -44,3 +44,24 @@ struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewPlayerNode : public FEdGr
         return Type;
     }
 };
+
+USTRUCT()
+struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewTransferNode : public FEdGraphSchemaAction
+{
+    GENERATED_BODY()
+
+    FRPG_DialogAction_NewTransferNode() : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create Transfer Node")), FText::FromString(TEXT("Generates a new Transfer node")), 0)
+    {
+        
+    }
+
+    virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
+    
+    virtual FName GetTypeId() const override { return StaticGetTypeId(); }
+
+    static const FName& StaticGetTypeId()
+    {
+        static FName Type("FDialogEditorGraphSchemaAction_NewTransferNode");
+        return Type;
+    }
+};
