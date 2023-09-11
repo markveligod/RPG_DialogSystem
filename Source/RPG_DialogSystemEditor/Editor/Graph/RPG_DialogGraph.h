@@ -14,5 +14,10 @@ class RPG_DIALOGSYSTEMEDITOR_API URPG_DialogGraph : public UEdGraph
 {
     GENERATED_BODY()
 
+public:
+    
+    /** Returns the Quest Dialog that contains this graph */
+    class URPG_DialogObjectBase* GetDialogObject() const;
 
+    virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 };

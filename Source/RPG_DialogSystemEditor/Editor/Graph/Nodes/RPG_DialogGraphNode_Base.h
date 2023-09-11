@@ -6,6 +6,7 @@
 #include "EdGraph/EdGraphNode.h"
 #include "RPG_DialogGraphNode_Base.generated.h"
 
+class URPG_DialogSettingsObject;
 class URPG_DialogObjectBase;
 /**
  * 
@@ -43,10 +44,17 @@ public:
 
     int32 TargetIndexTaskNode{INDEX_NONE};
 
+    UEdGraphPin* OutputPin{nullptr};
+    UEdGraphPin* InPin{nullptr};
+
 #pragma endregion
 
 #pragma region ActionNode
 
+public:
+
+    URPG_DialogSettingsObject* GetDialogSettingsObject() const;
+    
 protected:
 
     URPG_DialogObjectBase* GetDialogObject() const;

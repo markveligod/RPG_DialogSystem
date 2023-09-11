@@ -3,6 +3,9 @@
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 #include "RPG_DialogSystemEditor/Settings/RPG_DialogSystemConfigEditor.h"
 
+#define PIN_DIALOG_IN TEXT("In")
+#define PIN_DIALOG_OUT TEXT("Out")
+
 URPG_DialogGraphNode_Base::URPG_DialogGraphNode_Base()
 {
 }
@@ -12,6 +15,27 @@ URPG_DialogGraphNode_Base::URPG_DialogGraphNode_Base()
 void URPG_DialogGraphNode_Base::AllocateDefaultPins()
 {
     Super::AllocateDefaultPins();
+
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
+    if (!DialogSettingsObject) return;
+
+    FName PinCategory = DialogSettingsObject->GetFName();
+
+    if (DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::Entry)
+    {
+        OutputPin = CreatePin(EGPD_Output, PinCategory, TEXT("Entry"), PIN_DIALOG_OUT);
+    }
+
+    if (DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode || DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::NPCNode)
+    {
+        InPin = CreatePin(EGPD_Input, PinCategory, *UEnum::GetValueAsString(DialogSettingsObject->TypeStateDialog), PIN_DIALOG_IN);
+        OutputPin = CreatePin(EGPD_Output, PinCategory, *UEnum::GetValueAsString(DialogSettingsObject->TypeStateDialog), PIN_DIALOG_OUT);
+    }
+
+    if (DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::Transfer)
+    {
+        InPin = CreatePin(EGPD_Input, PinCategory, TEXT("Transfer"), PIN_DIALOG_IN);
+    }
 }
 
 void URPG_DialogGraphNode_Base::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
@@ -21,10 +45,7 @@ void URPG_DialogGraphNode_Base::GetNodeContextMenuActions(UToolMenu* Menu, UGrap
 
 FText URPG_DialogGraphNode_Base::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-    URPG_DialogObjectBase* DialogObject = GetDialogObject();
-    if (!DialogObject) return Super::GetNodeTitle(TitleType);
-
-    const URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
     if (!DialogSettingsObject) return Super::GetNodeTitle(TitleType);
 
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
@@ -39,10 +60,7 @@ FText URPG_DialogGraphNode_Base::GetNodeTitle(ENodeTitleType::Type TitleType) co
 
 FText URPG_DialogGraphNode_Base::GetTooltipText() const
 {
-    URPG_DialogObjectBase* DialogObject = GetDialogObject();
-    if (!DialogObject) return Super::GetTooltipText();
-
-    const URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
     if (!DialogSettingsObject) return Super::GetTooltipText();
 
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
@@ -57,9 +75,7 @@ FText URPG_DialogGraphNode_Base::GetTooltipText() const
 
 FLinearColor URPG_DialogGraphNode_Base::GetNodeTitleColor() const
 {
-    URPG_DialogObjectBase* DialogObject = GetDialogObject();
-    if (!DialogObject) return Super::GetNodeTitleColor();
-    URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
     if (!DialogSettingsObject) return Super::GetNodeTitleColor();
 
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
@@ -75,9 +91,7 @@ FLinearColor URPG_DialogGraphNode_Base::GetNodeTitleColor() const
 
 FLinearColor URPG_DialogGraphNode_Base::GetNodeCommentColor() const
 {
-    URPG_DialogObjectBase* DialogObject = GetDialogObject();
-    if (!DialogObject) return Super::GetNodeCommentColor();
-    URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
     if (!DialogSettingsObject) return Super::GetNodeCommentColor();
 
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
@@ -93,9 +107,7 @@ FLinearColor URPG_DialogGraphNode_Base::GetNodeCommentColor() const
 
 FLinearColor URPG_DialogGraphNode_Base::GetNodeBodyTintColor() const
 {
-    URPG_DialogObjectBase* DialogObject = GetDialogObject();
-    if (!DialogObject) return Super::GetNodeBodyTintColor();
-    URPG_DialogSettingsObject* DialogSettingsObject = DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
     if (!DialogSettingsObject) return Super::GetNodeBodyTintColor();
 
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
@@ -117,6 +129,14 @@ void URPG_DialogGraphNode_Base::NodeConnectionListChanged()
 #pragma endregion
 
 #pragma region ActionNode
+
+URPG_DialogSettingsObject* URPG_DialogGraphNode_Base::GetDialogSettingsObject() const
+{
+    URPG_DialogObjectBase* DialogObject = GetDialogObject();
+    if (!DialogObject) return nullptr;
+
+    return DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+}
 
 URPG_DialogObjectBase* URPG_DialogGraphNode_Base::GetDialogObject() const
 {

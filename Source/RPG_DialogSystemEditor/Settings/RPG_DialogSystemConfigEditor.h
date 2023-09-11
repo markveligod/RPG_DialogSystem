@@ -33,4 +33,10 @@ public:
 
     UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
     TMap<ERPG_TypeStateDialog, FString> NodeTooltipText;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    FLinearColor SchemeTypePinColor{FLinearColor::White};
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    FLinearColor SchemeSecondaryPinColor{FLinearColor::White};
 };

@@ -6,6 +6,7 @@
 #include "Nodes/RPG_DialogGraphNode_Base.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
+#include "RPG_DialogSystemEditor/Settings/RPG_DialogSystemConfigEditor.h"
 
 #define LOCTEXT_NAMESPACE "DialogSchema"
 
@@ -71,11 +72,19 @@ bool URPG_DialogEdGraphSchema::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* 
 
 FLinearColor URPG_DialogEdGraphSchema::GetPinTypeColor(const FEdGraphPinType& PinType) const
 {
+    if (const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>())
+    {
+        return DialogSystemConfigEditor->SchemeTypePinColor;
+    }
     return Super::GetPinTypeColor(PinType);
 }
 
 FLinearColor URPG_DialogEdGraphSchema::GetSecondaryPinTypeColor(const FEdGraphPinType& PinType) const
 {
+    if (const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>())
+    {
+        return DialogSystemConfigEditor->SchemeSecondaryPinColor;
+    }
     return Super::GetSecondaryPinTypeColor(PinType);
 }
 
