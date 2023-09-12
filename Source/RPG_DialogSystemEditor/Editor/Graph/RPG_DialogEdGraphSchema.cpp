@@ -8,6 +8,9 @@
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 #include "RPG_DialogSystemEditor/Settings/RPG_DialogSystemConfigEditor.h"
 
+#define DISALLOW_CONNECT FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT("Not implemented by this schema"))
+#define ALLOW_CONNECT FPinConnectionResponse(CONNECT_RESPONSE_MAKE, TEXT("Allow connect pins"));
+
 #define LOCTEXT_NAMESPACE "DialogSchema"
 
 void URPG_DialogEdGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
@@ -62,7 +65,22 @@ void URPG_DialogEdGraphSchema::AutoConnectNodeByDefault(UEdGraph& Graph) const
 
 const FPinConnectionResponse URPG_DialogEdGraphSchema::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const
 {
-    return Super::CanCreateConnection(A, B);
+    if (!A || !B) return DISALLOW_CONNECT;
+    if (A == B) return DISALLOW_CONNECT;
+    if (A->Direction == EGPD_Input && B->Direction == EGPD_Input) return DISALLOW_CONNECT;
+    if (A->Direction == EGPD_Output && B->Direction == EGPD_Output) return DISALLOW_CONNECT;
+    if (A->GetOwningNode() == B->GetOwningNode()) return DISALLOW_CONNECT;
+
+    URPG_DialogGraphNode_Base* A_GraphNode = Cast<URPG_DialogGraphNode_Base>(A->GetOwningNode());
+    URPG_DialogGraphNode_Base* B_GraphNode = Cast<URPG_DialogGraphNode_Base>(B->GetOwningNode());
+    if (!A_GraphNode || !B_GraphNode) return DISALLOW_CONNECT;
+
+    URPG_DialogSettingsObject* A_DialogSettingsObject = A_GraphNode->GetDialogSettingsObject();
+    URPG_DialogSettingsObject* B_DialogSettingsObject = B_GraphNode->GetDialogSettingsObject();
+    if (!A_DialogSettingsObject || !B_DialogSettingsObject) return DISALLOW_CONNECT;
+    if (A_DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode && B_DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode) return DISALLOW_CONNECT;
+
+    return ALLOW_CONNECT;
 }
 
 bool URPG_DialogEdGraphSchema::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const
