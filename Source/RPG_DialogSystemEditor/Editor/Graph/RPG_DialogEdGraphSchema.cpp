@@ -61,6 +61,19 @@ void URPG_DialogEdGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 
 void URPG_DialogEdGraphSchema::AutoConnectNodeByDefault(UEdGraph& Graph) const
 {
+    for (auto Node : Graph.Nodes)
+    {
+        const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node.Get());
+        if (!DialogGraphNode) continue;
+
+        URPG_DialogSettingsObject* DialogSettingData = DialogGraphNode->GetDialogSettingsObject();
+        if (!DialogSettingData) continue;
+
+        for (const int32 IndexNode : DialogSettingData->OutNodes)
+        {
+            DialogGraphNode->MakeLink(FindDialogGraphNodeByIndex(Graph, IndexNode));
+        }
+    }
 }
 
 const FPinConnectionResponse URPG_DialogEdGraphSchema::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const
@@ -85,7 +98,17 @@ const FPinConnectionResponse URPG_DialogEdGraphSchema::CanCreateConnection(const
 
 bool URPG_DialogEdGraphSchema::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const
 {
-    return Super::TryCreateConnection(A, B);
+    if (Super::TryCreateConnection(A, B))
+    {
+        URPG_DialogGraphNode_Base* A_GraphNode = Cast<URPG_DialogGraphNode_Base>(A->GetOwningNode());
+        URPG_DialogGraphNode_Base* B_GraphNode = Cast<URPG_DialogGraphNode_Base>(B->GetOwningNode());
+        if (!A_GraphNode || !B_GraphNode) return false;
+
+        A_GraphNode->NodeConnectionListChanged();
+        B_GraphNode->NodeConnectionListChanged();
+    }
+
+    return false;
 }
 
 FLinearColor URPG_DialogEdGraphSchema::GetPinTypeColor(const FEdGraphPinType& PinType) const
@@ -128,6 +151,18 @@ UEdGraphNode* URPG_DialogEdGraphSchema::CreateStandardNodeForGraph(UEdGraph* Gra
         return ResultRootNode;
     }
     return nullptr;
+}
+
+URPG_DialogGraphNode_Base* URPG_DialogEdGraphSchema::FindDialogGraphNodeByIndex(UEdGraph& Graph, int32 TargetIndexNode) const
+{
+    const auto FindElem = Graph.Nodes.FindByPredicate([TargetIndexNode](TObjectPtr<UEdGraphNode>& Data)
+    {
+        URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Data.Get());
+        if (!DialogGraphNode) return false;
+        return DialogGraphNode->TargetIndexTaskNode == TargetIndexNode;
+    });
+
+    return FindElem ? Cast<URPG_DialogGraphNode_Base>(FindElem->Get()) : nullptr;
 }
 
 #undef LOCTEXT_NAMESPACE

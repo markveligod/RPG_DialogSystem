@@ -7,6 +7,7 @@
 #include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
 #include "RPG_DialogEdGraphSchema.generated.h"
 
+class URPG_DialogGraphNode_Base;
 /**
  * 
  */
@@ -28,4 +29,9 @@ public:
     //~ End EdGraphSchema Interface
 
     virtual UEdGraphNode* CreateStandardNodeForGraph(UEdGraph* Graph, const FVector2D& InLocationNode, ERPG_TypeStateDialog TypeStateDialog) const;
+
+private:
+
+    URPG_DialogGraphNode_Base* FindDialogGraphNodeByIndex(UEdGraph& Graph, int32 TargetIndexNode) const;
+
 };

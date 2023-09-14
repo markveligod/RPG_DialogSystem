@@ -24,3 +24,8 @@ bool URPG_DialogConditionTask::IsConditionTask_Event_Implementation()
 }
 
 #pragma endregion
+
+#pragma region ActionDialog
+
+
+#pragma endregion

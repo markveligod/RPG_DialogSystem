@@ -87,6 +87,20 @@ URPG_DialogSettingsObject* URPG_DialogObjectBase::FindStartNode()
     return FindElem ? *FindElem : nullptr;
 }
 
+bool URPG_DialogObjectBase::IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes)
+{
+    for (const int32 NodeID : OutNodes)
+    {
+        const URPG_DialogSettingsObject* DialogSetting = FindNodeByIndex(NodeID);
+        if (!DialogSetting) continue;
+        if (DialogSetting->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 URPG_DialogSettingsObject* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
 {
     const int32 FreeNumber = GetFreeIndexNumSlot();

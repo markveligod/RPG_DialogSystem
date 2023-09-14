@@ -64,6 +64,9 @@ public:
     UFUNCTION(BlueprintCallable)
     const FText& GetTextDialog() const { return TextDialog; }
 
+    UFUNCTION(BlueprintCallable)
+    bool IsSomeHaveOutPlayerNode();
+    
 #pragma endregion
 
 #pragma region DataDialog

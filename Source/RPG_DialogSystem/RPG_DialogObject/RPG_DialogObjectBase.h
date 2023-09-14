@@ -74,6 +74,9 @@ public:
     /** @public Get all dialog objects **/
     const TArray<URPG_DialogSettingsObject*>& GetArrayDialogNode() { return ArrayDialogNode; }
 
+    /** @public  **/
+    bool IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes);
+    
 #if WITH_EDITOR
 
 public:

@@ -54,7 +54,9 @@ public:
 public:
 
     URPG_DialogSettingsObject* GetDialogSettingsObject() const;
-    
+
+    void MakeLink(const URPG_DialogGraphNode_Base* To) const;
+
 protected:
 
     URPG_DialogObjectBase* GetDialogObject() const;

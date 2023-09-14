@@ -51,8 +51,9 @@ FText URPG_DialogGraphNode_Base::GetNodeTitle(ENodeTitleType::Type TitleType) co
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
     if (!DialogSystemConfigEditor) return Super::GetNodeTitle(TitleType);
 
-    const FString NodeTitleText = DialogSystemConfigEditor->NodeTitleText.Contains(DialogSettingsObject->TypeStateDialog) ?
-        DialogSystemConfigEditor->NodeTitleText[DialogSettingsObject->TypeStateDialog] : TEXT("None");
+    const FString NodeTitleText = DialogSystemConfigEditor->NodeTitleText.Contains(DialogSettingsObject->TypeStateDialog)
+                                      ? DialogSystemConfigEditor->NodeTitleText[DialogSettingsObject->TypeStateDialog]
+                                      : TEXT("None");
 
     return FText::FromString(FString::Printf(TEXT("#%i | %s"),
         DialogSettingsObject->IndexNode, *NodeTitleText));
@@ -66,8 +67,9 @@ FText URPG_DialogGraphNode_Base::GetTooltipText() const
     const URPG_DialogSystemConfigEditor* DialogSystemConfigEditor = GetDefault<URPG_DialogSystemConfigEditor>();
     if (!DialogSystemConfigEditor) return Super::GetTooltipText();
 
-    const FString NodeTooltipText = DialogSystemConfigEditor->NodeTooltipText.Contains(DialogSettingsObject->TypeStateDialog) ?
-        DialogSystemConfigEditor->NodeTooltipText[DialogSettingsObject->TypeStateDialog] : TEXT("None");
+    const FString NodeTooltipText = DialogSystemConfigEditor->NodeTooltipText.Contains(DialogSettingsObject->TypeStateDialog)
+                                        ? DialogSystemConfigEditor->NodeTooltipText[DialogSettingsObject->TypeStateDialog]
+                                        : TEXT("None");
 
     return FText::FromString(FString::Printf(TEXT("#%i | %s"),
         DialogSettingsObject->IndexNode, *NodeTooltipText));
@@ -85,7 +87,7 @@ FLinearColor URPG_DialogGraphNode_Base::GetNodeTitleColor() const
     {
         return DialogSystemConfigEditor->NodeTitleColor[DialogSettingsObject->TypeStateDialog];
     }
-    
+
     return Super::GetNodeTitleColor();
 }
 
@@ -101,7 +103,7 @@ FLinearColor URPG_DialogGraphNode_Base::GetNodeCommentColor() const
     {
         return DialogSystemConfigEditor->NodeCommentColor[DialogSettingsObject->TypeStateDialog];
     }
-    
+
     return Super::GetNodeCommentColor();
 }
 
@@ -117,13 +119,26 @@ FLinearColor URPG_DialogGraphNode_Base::GetNodeBodyTintColor() const
     {
         return DialogSystemConfigEditor->NodeBodyTintColor[DialogSettingsObject->TypeStateDialog];
     }
-    
+
     return Super::GetNodeBodyTintColor();
 }
 
 void URPG_DialogGraphNode_Base::NodeConnectionListChanged()
 {
     Super::NodeConnectionListChanged();
+
+    URPG_DialogSettingsObject* DialogSettingsObject = GetDialogSettingsObject();
+    if (!DialogSettingsObject) return;
+
+    if (!OutputPin) return;
+    for (UEdGraphPin* Pin : OutputPin->LinkedTo)
+    {
+        if (!Pin) continue;
+        if (const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Pin->GetOwningNode()))
+        {
+            DialogSettingsObject->OutNodes.AddUnique(DialogGraphNode->TargetIndexTaskNode);
+        }
+    }
 }
 
 #pragma endregion
@@ -136,6 +151,14 @@ URPG_DialogSettingsObject* URPG_DialogGraphNode_Base::GetDialogSettingsObject() 
     if (!DialogObject) return nullptr;
 
     return DialogObject->FindNodeByIndex(TargetIndexTaskNode);
+}
+
+void URPG_DialogGraphNode_Base::MakeLink(const URPG_DialogGraphNode_Base* To) const
+{
+    if (OutputPin && To)
+    {
+        OutputPin->MakeLinkTo(To->InPin);
+    }
 }
 
 URPG_DialogObjectBase* URPG_DialogGraphNode_Base::GetDialogObject() const
