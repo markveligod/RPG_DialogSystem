@@ -63,15 +63,10 @@ public:
 
     UFUNCTION(BlueprintCallable)
     const FText& GetTextDialog() const { return TextDialog; }
-
-    UFUNCTION(BlueprintCallable)
-    bool IsSomeHaveOutPlayerNode();
     
 #pragma endregion
 
 #pragma region DataDialog
-
-#if WITH_EDITORONLY_DATA
 
 public:
 
@@ -86,8 +81,6 @@ public:
 
     UPROPERTY(VisibleAnywhere)
     TArray<int32> OutNodes;
-
-#endif
     
 private:
     UPROPERTY(EditAnywhere)

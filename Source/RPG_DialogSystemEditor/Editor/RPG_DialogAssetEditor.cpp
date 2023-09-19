@@ -2,8 +2,10 @@
 
 #include "Graph/RPG_DialogEdGraphSchema.h"
 #include "Graph/RPG_DialogGraph.h"
+#include "Graph/Nodes/RPG_DialogGraphNode_Base.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
+#include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 
 #define LOCTEXT_NAMESPACE "DialogAssetEditor"
 
@@ -226,17 +228,26 @@ FGraphAppearanceInfo FRPG_DialogAssetEditor::GetGraphAppearanceInfo()
 
 void FRPG_DialogAssetEditor::OnSelectedNodesChanged(const TSet<UObject*>& Nodes)
 {
+    TArray<UObject*> Objects;
+
+    for (auto Node : Nodes)
+    {
+        URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
+        if (!DialogGraphNode) continue;
+
+        URPG_DialogSettingsObject* DialogSettingsObject = DialogGraphNode->GetDialogSettingsObject();
+        if (!DialogSettingsObject) continue;
+
+        if (DialogSettingsObject->TypeStateDialog != ERPG_TypeStateDialog::Entry && DialogSettingsObject->TypeStateDialog != ERPG_TypeStateDialog::None)
+        {
+            Objects.Add(DialogSettingsObject);
+        }
+    }
+    
+    DialogProperties->SetObjects(Objects);
 }
 
 void FRPG_DialogAssetEditor::OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged)
-{
-}
-
-void FRPG_DialogAssetEditor::CreateNPCNode()
-{
-}
-
-void FRPG_DialogAssetEditor::CreatePlayerNode()
 {
 }
 
