@@ -2,6 +2,7 @@
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 #include "RPG_DialogSystemEditor/Settings/RPG_DialogSystemConfigEditor.h"
+#include "Widgets/SDialogGraphNode.h"
 
 #define PIN_DIALOG_IN TEXT("In")
 #define PIN_DIALOG_OUT TEXT("Out")
@@ -139,6 +140,11 @@ void URPG_DialogGraphNode_Base::NodeConnectionListChanged()
             DialogSettingsObject->OutNodes.AddUnique(DialogGraphNode->TargetIndexTaskNode);
         }
     }
+}
+
+TSharedPtr<SGraphNode> URPG_DialogGraphNode_Base::CreateVisualWidget()
+{
+    return SNew(SDialogGraphNode, this);
 }
 
 #pragma endregion

@@ -34,6 +34,7 @@ public:
     virtual FLinearColor GetNodeCommentColor() const override;
     virtual FLinearColor GetNodeBodyTintColor() const override;
     virtual void NodeConnectionListChanged() override;
+    virtual TSharedPtr<SGraphNode> CreateVisualWidget() override;
     // End of UEdGraphNode interface.
 
 #pragma endregion
