@@ -18,7 +18,14 @@ public:
 
     virtual void UpdateGraphNode() override;
 
+    virtual void UpdateOwnerEditorChange(FPropertyChangedEvent& PropertyChangedEvent);
+
+    virtual void CreateTextDialogBlock(TSharedPtr<SVerticalBox> MainBox);
 protected:
 
     URPG_DialogGraphNode_Base* DialogGraphNode{nullptr};
+
+private:
+
+    TSharedPtr<STextBlock> TextSDialog;
 };

@@ -83,7 +83,7 @@ public:
     TArray<int32> OutNodes;
     
 private:
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, meta = (MultiLine = true))
     FText TextDialog;
 
     UPROPERTY(EditAnywhere, Instanced)

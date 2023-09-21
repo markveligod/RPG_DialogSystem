@@ -8,6 +8,7 @@
 
 class URPG_DialogSettingsObject;
 class URPG_DialogObjectBase;
+class SDialogGraphNode;
 /**
  * 
  */
@@ -48,6 +49,9 @@ public:
     UEdGraphPin* OutputPin{nullptr};
     UEdGraphPin* InPin{nullptr};
 
+private:
+    
+    TSharedPtr<SDialogGraphNode> DialogSGraphNode;
 #pragma endregion
 
 #pragma region ActionNode
@@ -62,6 +66,8 @@ protected:
 
     URPG_DialogObjectBase* GetDialogObject() const;
 
+    virtual void DialogGraphNode_EditChangeProperty(UObject* Object, struct FPropertyChangedEvent& PropertyChangedEvent);
+    
 #pragma endregion
     
 };

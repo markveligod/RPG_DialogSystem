@@ -37,6 +37,8 @@ void URPG_DialogGraphNode_Base::AllocateDefaultPins()
     {
         InPin = CreatePin(EGPD_Input, PinCategory, TEXT("Transfer"), PIN_DIALOG_IN);
     }
+
+    FCoreUObjectDelegates::OnObjectPropertyChanged.AddUObject(this, &ThisClass::DialogGraphNode_EditChangeProperty);
 }
 
 void URPG_DialogGraphNode_Base::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
@@ -144,7 +146,8 @@ void URPG_DialogGraphNode_Base::NodeConnectionListChanged()
 
 TSharedPtr<SGraphNode> URPG_DialogGraphNode_Base::CreateVisualWidget()
 {
-    return SNew(SDialogGraphNode, this);
+    DialogSGraphNode = SNew(SDialogGraphNode, this);
+    return DialogSGraphNode;
 }
 
 #pragma endregion
@@ -170,6 +173,13 @@ void URPG_DialogGraphNode_Base::MakeLink(const URPG_DialogGraphNode_Base* To) co
 URPG_DialogObjectBase* URPG_DialogGraphNode_Base::GetDialogObject() const
 {
     return GetGraph() ? Cast<URPG_DialogObjectBase>(GetGraph()->GetOuter()) : nullptr;
+}
+
+void URPG_DialogGraphNode_Base::DialogGraphNode_EditChangeProperty(UObject* Object, FPropertyChangedEvent& PropertyChangedEvent)
+{
+    if (Object != GetDialogSettingsObject()) return;
+
+    DialogSGraphNode->UpdateOwnerEditorChange(PropertyChangedEvent);
 }
 
 #pragma endregion

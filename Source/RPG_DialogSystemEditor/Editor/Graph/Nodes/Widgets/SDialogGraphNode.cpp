@@ -5,6 +5,7 @@
 #include "SlateOptMacros.h"
 #include "SLevelOfDetailBranchNode.h"
 #include "TutorialMetaData.h"
+#include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 
 void SDialogGraphNode::Construct(const FArguments& InArgs, URPG_DialogGraphNode_Base* InNode)
 {
@@ -260,6 +261,35 @@ void SDialogGraphNode::UpdateGraphNode()
     CreateOutputSideAddButton(RightNodeBox);
     CreateBelowPinControls(InnerVerticalBox);
     CreateAdvancedViewArrow(InnerVerticalBox);
+    CreateTextDialogBlock(InnerVerticalBox);
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
+
+void SDialogGraphNode::UpdateOwnerEditorChange(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    if (TextSDialog && DialogGraphNode && DialogGraphNode->GetDialogSettingsObject())
+    {
+        TextSDialog->SetText(DialogGraphNode->GetDialogSettingsObject()->GetTextDialog());
+    }
+}
+
+void SDialogGraphNode::CreateTextDialogBlock(TSharedPtr<SVerticalBox> MainBox)
+{
+    if (!DialogGraphNode) return;
+    if (!DialogGraphNode->GetDialogSettingsObject()) return;
+    if (DialogGraphNode->GetDialogSettingsObject()->TypeStateDialog != ERPG_TypeStateDialog::PlayerNode && DialogGraphNode->GetDialogSettingsObject()->TypeStateDialog != ERPG_TypeStateDialog::NPCNode) return;
+    
+    TextSDialog = SNew(STextBlock)
+            .Text(DialogGraphNode->GetDialogSettingsObject()->GetTextDialog())
+            .Visibility(EVisibility::Visible);
+    
+    MainBox->AddSlot()
+        .AutoHeight()
+        .HAlign(HAlign_Fill)
+        .VAlign(VAlign_Center)
+        .Padding(5, 3, 5, 5)
+        [
+            TextSDialog.ToSharedRef()
+        ];
+}
