@@ -11,11 +11,11 @@
  *
  */
 UCLASS(DisplayName = "DialogEvent", EditInlineNew)
-class RPG_DIALOGSYSTEM_API URPG_DialogConditionEvent : public UObject
+class RPG_DIALOGSYSTEM_API URPG_DialogEvent : public UObject
 {
     GENERATED_BODY()
 
-#pragma region ActionDialogEvent
+#pragma region Action
 
 public:
     virtual void TriggerCondition();
@@ -30,12 +30,12 @@ protected:
 /**
  *
  */
-UCLASS(DisplayName = "DialogTask", EditInlineNew)
-class RPG_DIALOGSYSTEM_API URPG_DialogConditionTask : public UObject
+UCLASS(DisplayName = "DialogCondition", EditInlineNew)
+class RPG_DIALOGSYSTEM_API URPG_DialogCondition : public UObject
 {
     GENERATED_BODY()
 
-#pragma region ActionDialogTask
+#pragma region Action
 
 public:
     virtual bool IsConditionTask();
@@ -63,6 +63,12 @@ public:
 
     UFUNCTION(BlueprintCallable)
     const FText& GetTextDialog() const { return TextDialog; }
+
+    UFUNCTION(BlueprintCallable)
+    bool IsHaveSomeCondition() const { return ArrayCondition.Num() != 0; }
+
+    UFUNCTION(BlueprintCallable)
+    bool IsHaveSomeEvent() const { return ArrayEvent.Num() != 0; }
     
 #pragma endregion
 
@@ -87,10 +93,10 @@ private:
     FText TextDialog;
 
     UPROPERTY(EditAnywhere, Instanced)
-    TArray<URPG_DialogConditionTask*> ArrayConditionTask;
+    TArray<URPG_DialogCondition*> ArrayCondition;
 
     UPROPERTY(EditAnywhere, Instanced)
-    TArray<URPG_DialogConditionEvent*> ArrayConditionEvent;
+    TArray<URPG_DialogEvent*> ArrayEvent;
 
 #pragma endregion
 };

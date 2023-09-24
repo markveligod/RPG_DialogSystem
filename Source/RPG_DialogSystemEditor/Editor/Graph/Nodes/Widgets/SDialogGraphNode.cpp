@@ -6,6 +6,7 @@
 #include "SLevelOfDetailBranchNode.h"
 #include "TutorialMetaData.h"
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
+#include "RPG_DialogSystemEditor/Style/FRPG_DialogSystemStyle.h"
 
 void SDialogGraphNode::Construct(const FArguments& InArgs, URPG_DialogGraphNode_Base* InNode)
 {
@@ -262,6 +263,8 @@ void SDialogGraphNode::UpdateGraphNode()
     CreateBelowPinControls(InnerVerticalBox);
     CreateAdvancedViewArrow(InnerVerticalBox);
     CreateTextDialogBlock(InnerVerticalBox);
+    CreateConditionIcon(LeftNodeBox);
+    CreateEventIcon(RightNodeBox);
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -292,4 +295,64 @@ void SDialogGraphNode::CreateTextDialogBlock(TSharedPtr<SVerticalBox> MainBox)
         [
             TextSDialog.ToSharedRef()
         ];
+}
+
+void SDialogGraphNode::CreateConditionIcon(TSharedPtr<SVerticalBox> MainBox)
+{
+    if (!DialogGraphNode) return;
+    if (!DialogGraphNode->GetDialogSettingsObject()) return;
+    if (DialogGraphNode->GetDialogSettingsObject()->TypeStateDialog != ERPG_TypeStateDialog::PlayerNode && DialogGraphNode->GetDialogSettingsObject()->TypeStateDialog != ERPG_TypeStateDialog::NPCNode) return;
+
+    CondImageSDialog = SNew(SImage)
+    .Visibility(this, &SDialogGraphNode::GetVisibilityCondition)
+    .Image(FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconCondition()))
+    .ColorAndOpacity(FSlateColor(FColor::Cyan));
+
+    MainBox->AddSlot()
+        .AutoHeight()
+        .HAlign(HAlign_Center)
+        .VAlign(VAlign_Center)
+        .Padding(0, 0, 0, 0)
+        [
+            CondImageSDialog.ToSharedRef()
+        ];
+}
+
+void SDialogGraphNode::CreateEventIcon(TSharedPtr<SVerticalBox> MainBox)
+{
+    if (!DialogGraphNode) return;
+    if (!DialogGraphNode->GetDialogSettingsObject()) return;
+    if (DialogGraphNode->GetDialogSettingsObject()->TypeStateDialog != ERPG_TypeStateDialog::PlayerNode && DialogGraphNode->GetDialogSettingsObject()->TypeStateDialog != ERPG_TypeStateDialog::NPCNode) return;
+
+    EventImageSDialog = SNew(SImage)
+    .Visibility(this, &SDialogGraphNode::GetVisibilityEvent)
+    .Image(FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconEvent()))
+    .ColorAndOpacity(FSlateColor(FColor::Red));
+
+    MainBox->AddSlot()
+        .AutoHeight()
+        .HAlign(HAlign_Center)
+        .VAlign(VAlign_Center)
+        .Padding(0, 0, 0, 0)
+        [
+            EventImageSDialog.ToSharedRef()
+        ];
+}
+
+EVisibility SDialogGraphNode::GetVisibilityCondition() const
+{
+    if (DialogGraphNode && DialogGraphNode->GetDialogSettingsObject())
+    {
+        return DialogGraphNode->GetDialogSettingsObject()->IsHaveSomeCondition() ? EVisibility::Visible : EVisibility::Hidden;
+    }
+    return EVisibility::Hidden;
+}
+
+EVisibility SDialogGraphNode::GetVisibilityEvent() const
+{
+    if (DialogGraphNode && DialogGraphNode->GetDialogSettingsObject())
+    {
+        return DialogGraphNode->GetDialogSettingsObject()->IsHaveSomeEvent() ? EVisibility::Visible : EVisibility::Hidden;
+    }
+    return EVisibility::Hidden;
 }

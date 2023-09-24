@@ -21,11 +21,19 @@ public:
     virtual void UpdateOwnerEditorChange(FPropertyChangedEvent& PropertyChangedEvent);
 
     virtual void CreateTextDialogBlock(TSharedPtr<SVerticalBox> MainBox);
+    virtual void CreateConditionIcon(TSharedPtr<SVerticalBox> MainBox);
+    virtual void CreateEventIcon(TSharedPtr<SVerticalBox> MainBox);
 protected:
 
     URPG_DialogGraphNode_Base* DialogGraphNode{nullptr};
-
+    
 private:
 
     TSharedPtr<STextBlock> TextSDialog;
+    TSharedPtr<SImage> CondImageSDialog;
+    TSharedPtr<SImage> EventImageSDialog;
+
+    EVisibility GetVisibilityCondition() const;
+    EVisibility GetVisibilityEvent() const;
 };
+

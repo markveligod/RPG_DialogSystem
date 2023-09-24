@@ -4,7 +4,7 @@
 
 #pragma region ActionDialogEvent
 
-void URPG_DialogConditionEvent::TriggerCondition()
+void URPG_DialogEvent::TriggerCondition()
 {
     TriggerCondition_Event();
 }
@@ -13,12 +13,12 @@ void URPG_DialogConditionEvent::TriggerCondition()
 
 #pragma region ActionDialogTask
 
-bool URPG_DialogConditionTask::IsConditionTask()
+bool URPG_DialogCondition::IsConditionTask()
 {
     return IsConditionTask_Event();
 }
 
-bool URPG_DialogConditionTask::IsConditionTask_Event_Implementation()
+bool URPG_DialogCondition::IsConditionTask_Event_Implementation()
 {
     return true;
 }

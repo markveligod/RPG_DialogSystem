@@ -2,6 +2,7 @@
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
 #include "Actions/FRPG_DialogAssetTypeActions.h"
+#include "Style/FRPG_DialogSystemStyle.h"
 
 #define LOCTEXT_NAMESPACE "FRPG_DialogSystemEditorModule"
 
@@ -9,10 +10,14 @@ EAssetTypeCategories::Type FRPG_DialogSystemEditorModule::AssetDialogEditorCateg
 
 void FRPG_DialogSystemEditorModule::StartupModule()
 {
+    FRPG_DialogSystemStyle::Initialize();
     RegisterAssetCategoryAndActions();
 }
 
-void FRPG_DialogSystemEditorModule::ShutdownModule() {}
+void FRPG_DialogSystemEditorModule::ShutdownModule()
+{
+    FRPG_DialogSystemStyle::Shutdown();
+}
 
 void FRPG_DialogSystemEditorModule::RegisterAssetCategoryAndActions() const
 {
