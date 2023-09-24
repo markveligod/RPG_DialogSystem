@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
-
 #include "RPG_DialogObject/RPG_DialogObjectBase.h"
 
 #pragma region ActionDialogEvent
@@ -29,9 +28,6 @@ bool URPG_DialogCondition::IsConditionNative_Implementation()
 
 #pragma region ActionDialog
 
-
-#pragma endregion
-
 TArray<FName> URPG_DialogSettingsObject::GetAllDialogPlayerAndNPCNames() const
 {
     TArray<FName> Array;
@@ -39,7 +35,7 @@ TArray<FName> URPG_DialogSettingsObject::GetAllDialogPlayerAndNPCNames() const
     if (URPG_DialogObjectBase* DialogObjectBase = Cast<URPG_DialogObjectBase>(GetOuter()))
     {
         const TArray<URPG_DialogSettingsObject*>& ArrayDialogSettings = DialogObjectBase->GetArrayDialogNode();
-        for (auto DialogSetting : ArrayDialogSettings)
+        for (const auto DialogSetting : ArrayDialogSettings)
         {
             if (!DialogSetting) continue;
             if (DialogSetting->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode || DialogSetting->TypeStateDialog == ERPG_TypeStateDialog::NPCNode)
@@ -52,3 +48,15 @@ TArray<FName> URPG_DialogSettingsObject::GetAllDialogPlayerAndNPCNames() const
 
     return Array;
 }
+
+int32 URPG_DialogSettingsObject::GetIndexTransferNode() const
+{
+    if (TypeStateDialog == ERPG_TypeStateDialog::Transfer)
+    {
+        return FCString::Atoi(*NameTransfer.ToString());
+    }
+    return INDEX_NONE;
+}
+
+#pragma endregion
+

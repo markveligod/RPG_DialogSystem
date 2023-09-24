@@ -39,4 +39,11 @@ public:
 
     UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
     FLinearColor SchemeSecondaryPinColor{FLinearColor::White};
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    FLinearColor IconEventColor{FLinearColor::Red};
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    FLinearColor IconConditionColor{FColor::Cyan};
+
 };

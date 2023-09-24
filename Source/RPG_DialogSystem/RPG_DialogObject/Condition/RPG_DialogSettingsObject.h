@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
-#include "UObject/NoExportTypes.h"
 #include "RPG_DialogSettingsObject.generated.h"
 
 /**
@@ -58,6 +57,7 @@ class RPG_DIALOGSYSTEM_API URPG_DialogSettingsObject : public UObject
 #pragma region ActionDialog
 
 public:
+
     UFUNCTION(BlueprintCallable)
     void SetupNewTextDialog(const FText& NewText) { TextDialog = NewText; }
 
@@ -69,7 +69,13 @@ public:
 
     UFUNCTION(BlueprintCallable)
     bool IsHaveSomeEvent() const { return ArrayEvent.Num() != 0; }
-    
+
+    UFUNCTION()
+    TArray<FName> GetAllDialogPlayerAndNPCNames() const;
+
+    UFUNCTION(BlueprintCallable)
+    int32 GetIndexTransferNode() const;
+
 #pragma endregion
 
 #pragma region DataDialog
@@ -101,8 +107,5 @@ private:
     UPROPERTY(EditAnywhere, meta = (EditCondition = "TypeStateDialog == ERPG_TypeStateDialog::Transfer", EditConditionHides, GetOptions = "GetAllDialogPlayerAndNPCNames"))
     FName NameTransfer;
 
-    UFUNCTION()
-    TArray<FName> GetAllDialogPlayerAndNPCNames() const;
-    
 #pragma endregion
 };

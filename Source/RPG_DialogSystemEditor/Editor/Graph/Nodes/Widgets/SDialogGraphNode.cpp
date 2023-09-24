@@ -6,6 +6,7 @@
 #include "SLevelOfDetailBranchNode.h"
 #include "TutorialMetaData.h"
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
+#include "RPG_DialogSystemEditor/Settings/RPG_DialogSystemConfigEditor.h"
 #include "RPG_DialogSystemEditor/Style/FRPG_DialogSystemStyle.h"
 
 void SDialogGraphNode::Construct(const FArguments& InArgs, URPG_DialogGraphNode_Base* InNode)
@@ -306,7 +307,7 @@ void SDialogGraphNode::CreateConditionIcon(TSharedPtr<SVerticalBox> MainBox)
     CondImageSDialog = SNew(SImage)
     .Visibility(this, &SDialogGraphNode::GetVisibilityCondition)
     .Image(FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconCondition()))
-    .ColorAndOpacity(FSlateColor(FColor::Cyan));
+    .ColorAndOpacity(this, &SDialogGraphNode::GetConditionSlateColor);
 
     MainBox->AddSlot()
         .AutoHeight()
@@ -327,7 +328,7 @@ void SDialogGraphNode::CreateEventIcon(TSharedPtr<SVerticalBox> MainBox)
     EventImageSDialog = SNew(SImage)
     .Visibility(this, &SDialogGraphNode::GetVisibilityEvent)
     .Image(FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconEvent()))
-    .ColorAndOpacity(FSlateColor(FColor::Red));
+    .ColorAndOpacity(this, &SDialogGraphNode::GetEventSlateColor);
 
     MainBox->AddSlot()
         .AutoHeight()
@@ -355,4 +356,22 @@ EVisibility SDialogGraphNode::GetVisibilityEvent() const
         return DialogGraphNode->GetDialogSettingsObject()->IsHaveSomeEvent() ? EVisibility::Visible : EVisibility::Hidden;
     }
     return EVisibility::Hidden;
+}
+
+FSlateColor SDialogGraphNode::GetEventSlateColor() const
+{
+    if (const URPG_DialogSystemConfigEditor* Config = GetDefault<URPG_DialogSystemConfigEditor>())
+    {
+        return FSlateColor(Config->IconEventColor);
+    }
+    return FSlateColor(FColor::Red);
+}
+
+FSlateColor SDialogGraphNode::GetConditionSlateColor() const
+{
+    if (const URPG_DialogSystemConfigEditor* Config = GetDefault<URPG_DialogSystemConfigEditor>())
+    {
+        return FSlateColor(Config->IconConditionColor);
+    }
+    return FSlateColor(FColor::Cyan);
 }

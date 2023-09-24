@@ -35,5 +35,8 @@ private:
 
     EVisibility GetVisibilityCondition() const;
     EVisibility GetVisibilityEvent() const;
+
+    FSlateColor GetEventSlateColor() const;
+    FSlateColor GetConditionSlateColor() const;
 };
 
