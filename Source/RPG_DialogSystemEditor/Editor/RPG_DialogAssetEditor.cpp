@@ -1,5 +1,6 @@
 ﻿#include "RPG_DialogAssetEditor.h"
-
+#include "FileHelpers.h"
+#include "Framework/Commands/GenericCommands.h"
 #include "Graph/RPG_DialogEdGraphSchema.h"
 #include "Graph/RPG_DialogGraph.h"
 #include "Graph/Nodes/RPG_DialogGraphNode_Base.h"
@@ -147,7 +148,11 @@ FString FRPG_DialogAssetEditor::GetReferencerName() const
 
 void FRPG_DialogAssetEditor::BindGraphCommands()
 {
-    
+    const FGenericCommands& GenericCommands = FGenericCommands::Get();
+
+    ToolkitCommands->MapAction(
+        GenericCommands.Delete, FExecuteAction::CreateSP(this, &FRPG_DialogAssetEditor::DeleteSelectedNodes), FCanExecuteAction::CreateSP(this, &FRPG_DialogAssetEditor::CanDeleteNodes));
+
 }
 
 void FRPG_DialogAssetEditor::InitDialogEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, URPG_DialogObjectBase* InitDialogObject)
@@ -249,6 +254,60 @@ void FRPG_DialogAssetEditor::OnSelectedNodesChanged(const TSet<UObject*>& Nodes)
 
 void FRPG_DialogAssetEditor::OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged)
 {
+}
+
+void FRPG_DialogAssetEditor::DeleteSelectedNodes()
+{
+    if (!DialogBeingEdited) return;
+    const FScopedTransaction Transaction(LOCTEXT("DeleteSelectedNode", "Delete Selected Node"));
+    FocusedGraphEditor->GetCurrentGraph()->Modify();
+
+    const FGraphPanelSelectionSet SelectedNodes = FocusedGraphEditor->GetSelectedNodes();
+
+    for (FGraphPanelSelectionSet::TConstIterator NodeIt(SelectedNodes); NodeIt; ++NodeIt)
+    {
+        UEdGraphNode* Node = CastChecked<UEdGraphNode>(*NodeIt);
+        if (Node && Node->CanUserDeleteNode())
+        {
+            const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
+            if (!DialogGraphNode) continue;
+
+            URPG_DialogSettingsObject* DialogSettingsObject = DialogGraphNode->GetDialogSettingsObject();
+            if (!DialogSettingsObject) continue;
+
+            DialogBeingEdited->RemoveIndexNode(DialogSettingsObject->IndexNode);
+            FBlueprintEditorUtils::RemoveNode(nullptr, Node, true);
+        }
+    }
+
+    if (SelectedNodes.Num() > 0 && DialogBeingEdited && DialogBeingEdited->GetClass())
+    {
+        DialogBeingEdited->Modify();
+        DialogBeingEdited->GetClass()->Modify();
+        TArray<UPackage*> PackagesToSave;
+        PackagesToSave.Add(DialogBeingEdited->GetClass()->GetOutermost());
+        FEditorFileUtils::PromptForCheckoutAndSave(PackagesToSave, false, false);
+    }
+}
+
+bool FRPG_DialogAssetEditor::CanDeleteNodes() const
+{
+    const FGraphPanelSelectionSet SelectedNodes = FocusedGraphEditor->GetSelectedNodes();
+    for (FGraphPanelSelectionSet::TConstIterator NodeIt(SelectedNodes); NodeIt; ++NodeIt)
+    {
+        const URPG_DialogGraphNode_Base* Node = Cast<URPG_DialogGraphNode_Base>(*NodeIt);
+        if (!Node) continue;
+
+        URPG_DialogSettingsObject* DialogSettingsObject = Node->GetDialogSettingsObject();
+        if (!DialogSettingsObject) continue;
+        
+        if (DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::Entry || DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::None)
+        {
+            return false;
+        }
+    }
+
+    return SelectedNodes.Num() > 0;
 }
 
 #undef LOCTEXT_NAMESPACE

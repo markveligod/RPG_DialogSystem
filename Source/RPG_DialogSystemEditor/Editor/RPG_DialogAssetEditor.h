@@ -55,6 +55,10 @@ protected:
     FGraphAppearanceInfo GetGraphAppearanceInfo();
     void OnSelectedNodesChanged(const TSet<UObject*>& Nodes);
     void OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged);
+
+    virtual void DeleteSelectedNodes();
+    virtual bool CanDeleteNodes() const;
+    
 private:
     /** The object we're currently editing */
     URPG_DialogObjectBase* DialogBeingEdited{nullptr};

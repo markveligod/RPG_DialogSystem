@@ -101,6 +101,20 @@ bool URPG_DialogObjectBase::IsSomeHaveOutPlayerNode(const TArray<int32>& OutNode
     return false;
 }
 
+void URPG_DialogObjectBase::RemoveIndexNode(int32 IndexNode)
+{
+    URPG_DialogSettingsObject* DialogSettingsObject = FindNodeByIndex(IndexNode);
+    if (!DialogSettingsObject) return;
+
+    for (auto Node : ArrayDialogNode)
+    {
+        Node->OutNodes.Remove(IndexNode);
+    }
+
+    ArrayDialogNode.Remove(DialogSettingsObject);
+    DialogSettingsObject->MarkAsGarbage();
+}
+
 URPG_DialogSettingsObject* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
 {
     const int32 FreeNumber = GetFreeIndexNumSlot();

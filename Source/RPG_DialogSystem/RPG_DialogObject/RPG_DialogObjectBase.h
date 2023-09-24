@@ -76,7 +76,10 @@ public:
 
     /** @public  **/
     bool IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes);
-    
+
+    /** @public  **/
+    void RemoveIndexNode(int32 IndexNode);
+
 #if WITH_EDITOR
 
 public:

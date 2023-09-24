@@ -3,6 +3,7 @@
 
 #include "RPG_DialogEdGraphSchema.h"
 #include "Actions/RPG_DialogGraphActions.h"
+#include "Framework/Commands/GenericCommands.h"
 #include "Nodes/RPG_DialogGraphNode_Base.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
@@ -33,6 +34,11 @@ void URPG_DialogEdGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNode
     // For Node
     Super::GetContextMenuActions(Menu, Context);
 
+    if (Context && Context->Node && Context->Node->IsA(URPG_DialogGraphNode_Base::StaticClass()))
+    {
+        FToolMenuSection& Section = Menu->AddSection(FName("DialogGraphSchemaNodeActions"), FText::FromString(TEXT("Node Actions")));
+        Section.AddMenuEntry(FGenericCommands::Get().Delete);
+    }
 }
 
 void URPG_DialogEdGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
