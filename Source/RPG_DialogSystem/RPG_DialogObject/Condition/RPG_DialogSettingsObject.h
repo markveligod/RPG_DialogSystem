@@ -18,11 +18,11 @@ class RPG_DIALOGSYSTEM_API URPG_DialogEvent : public UObject
 #pragma region Action
 
 public:
-    virtual void TriggerCondition();
+    virtual void TriggerEvent();
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)
-    void TriggerCondition_Event();
+    void Trigger_Event();
 
 #pragma endregion
 };
@@ -38,11 +38,11 @@ class RPG_DIALOGSYSTEM_API URPG_DialogCondition : public UObject
 #pragma region Action
 
 public:
-    virtual bool IsConditionTask();
+    virtual bool IsCondition();
 
 protected:
     UFUNCTION(BlueprintNativeEvent)
-    bool IsConditionTask_Event();
+    bool IsConditionNative();
 
 #pragma endregion
 };
@@ -89,14 +89,20 @@ public:
     TArray<int32> OutNodes;
     
 private:
-    UPROPERTY(EditAnywhere, meta = (MultiLine = true))
+    UPROPERTY(EditAnywhere, meta = (MultiLine = true, EditCondition = "TypeStateDialog == ERPG_TypeStateDialog::NPCNode || TypeStateDialog == ERPG_TypeStateDialog::PlayerNode", EditConditionHides))
     FText TextDialog;
 
-    UPROPERTY(EditAnywhere, Instanced)
+    UPROPERTY(EditAnywhere, Instanced, meta = (EditCondition = "TypeStateDialog == ERPG_TypeStateDialog::NPCNode || TypeStateDialog == ERPG_TypeStateDialog::PlayerNode", EditConditionHides))
     TArray<URPG_DialogCondition*> ArrayCondition;
 
-    UPROPERTY(EditAnywhere, Instanced)
+    UPROPERTY(EditAnywhere, Instanced, meta = (EditCondition = "TypeStateDialog == ERPG_TypeStateDialog::NPCNode || TypeStateDialog == ERPG_TypeStateDialog::PlayerNode", EditConditionHides))
     TArray<URPG_DialogEvent*> ArrayEvent;
 
+    UPROPERTY(EditAnywhere, meta = (EditCondition = "TypeStateDialog == ERPG_TypeStateDialog::Transfer", EditConditionHides, GetOptions = "GetAllDialogPlayerAndNPCNames"))
+    FName NameTransfer;
+
+    UFUNCTION()
+    TArray<FName> GetAllDialogPlayerAndNPCNames() const;
+    
 #pragma endregion
 };

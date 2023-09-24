@@ -2,23 +2,25 @@
 
 #include "RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 
+#include "RPG_DialogObject/RPG_DialogObjectBase.h"
+
 #pragma region ActionDialogEvent
 
-void URPG_DialogEvent::TriggerCondition()
+void URPG_DialogEvent::TriggerEvent()
 {
-    TriggerCondition_Event();
+    Trigger_Event();
 }
 
 #pragma endregion
 
 #pragma region ActionDialogTask
 
-bool URPG_DialogCondition::IsConditionTask()
+bool URPG_DialogCondition::IsCondition()
 {
-    return IsConditionTask_Event();
+    return IsConditionNative();
 }
 
-bool URPG_DialogCondition::IsConditionTask_Event_Implementation()
+bool URPG_DialogCondition::IsConditionNative_Implementation()
 {
     return true;
 }
@@ -29,3 +31,24 @@ bool URPG_DialogCondition::IsConditionTask_Event_Implementation()
 
 
 #pragma endregion
+
+TArray<FName> URPG_DialogSettingsObject::GetAllDialogPlayerAndNPCNames() const
+{
+    TArray<FName> Array;
+
+    if (URPG_DialogObjectBase* DialogObjectBase = Cast<URPG_DialogObjectBase>(GetOuter()))
+    {
+        const TArray<URPG_DialogSettingsObject*>& ArrayDialogSettings = DialogObjectBase->GetArrayDialogNode();
+        for (auto DialogSetting : ArrayDialogSettings)
+        {
+            if (!DialogSetting) continue;
+            if (DialogSetting->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode || DialogSetting->TypeStateDialog == ERPG_TypeStateDialog::NPCNode)
+            {
+                FString Result = FString::Printf(TEXT("#%i | %s..."), DialogSetting->IndexNode, *DialogSetting->GetTextDialog().ToString().Mid(0,15));
+                Array.Add(FName(Result));
+            }
+        }
+    }
+
+    return Array;
+}
