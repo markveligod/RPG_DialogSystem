@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
 #include "RPG_DialogObjectBase.generated.h"
 
@@ -22,8 +21,16 @@ public:
     URPG_DialogObjectBase();
     
     /** @public Initialization of internal parameters **/
+    UFUNCTION(BlueprintCallable)
     virtual bool InitDialog(APlayerController* PlayerController);
 
+    /** @public Get next dialog settings **/
+    UFUNCTION(BlueprintCallable)
+    URPG_DialogSettingsObject* NextDialog();
+
+    UFUNCTION(BlueprintCallable)
+    void ResetDialog();
+    
     /**
      * Handles reading, writing, and reference collecting using FArchive.
      * This implementation handles all FProperty serialization, but can be overridden for native variables.
@@ -66,15 +73,19 @@ public:
 
 public:
     /** @public Node search by index **/
+    UFUNCTION(BlueprintCallable)
     URPG_DialogSettingsObject* FindNodeByIndex(int32 IndexNode);
 
     /** @public Find start node **/
+    UFUNCTION(BlueprintCallable)
     URPG_DialogSettingsObject* FindStartNode();
 
     /** @public Get all dialog objects **/
+    UFUNCTION(BlueprintCallable)
     const TArray<URPG_DialogSettingsObject*>& GetArrayDialogNode() { return ArrayDialogNode; }
 
     /** @public  **/
+    UFUNCTION(BlueprintCallable)
     bool IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes);
 
     /** @public  **/
@@ -83,10 +94,12 @@ public:
 #if WITH_EDITOR
 
 public:
+
     /** @public Creating a new dialog node **/
     URPG_DialogSettingsObject* CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition);
 
 private:
+
     /** @private Search for a free number index **/
     int32 GetFreeIndexNumSlot() const;
 
@@ -104,6 +117,9 @@ private:
     /** @private Owner player controller **/
     UPROPERTY()
     APlayerController* OwnerPC{nullptr};
+
+    /** @private Owner player controller **/
+    int32 TargetIDNode{INDEX_NONE};
 
 #pragma endregion
 };

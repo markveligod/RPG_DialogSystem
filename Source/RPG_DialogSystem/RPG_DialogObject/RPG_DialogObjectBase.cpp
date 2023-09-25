@@ -22,9 +22,45 @@ URPG_DialogObjectBase::URPG_DialogObjectBase()
 bool URPG_DialogObjectBase::InitDialog(APlayerController* PlayerController)
 {
     if (CLOG_DIALOG_SYSTEM(PlayerController == nullptr, "Player controller is nullptr")) return false;
-
     OwnerPC = PlayerController;
+
+    const URPG_DialogSettingsObject* DialogSettingsObject = FindStartNode();
+    if (CLOG_DIALOG_SYSTEM(DialogSettingsObject == nullptr, "Start node is nullptr")) return false;
+    TargetIDNode = DialogSettingsObject->IndexNode;
+
     return true;
+}
+
+URPG_DialogSettingsObject* URPG_DialogObjectBase::NextDialog()
+{
+    URPG_DialogSettingsObject* TargetNode = FindNodeByIndex(TargetIDNode);
+    if (CLOG_DIALOG_SYSTEM(TargetNode == nullptr, "Target node is nullptr")) return nullptr;
+    TargetNode->ExecuteEvents();
+
+    TargetNode->OutNodes.Sort([&](int32 LeftID, int32 RightID)
+    {
+        const URPG_DialogSettingsObject* LeftDialogSettings = FindNodeByIndex(LeftID);
+        const URPG_DialogSettingsObject* RightDialogSettings = FindNodeByIndex(RightID);
+        if (LeftDialogSettings && RightDialogSettings)
+        {
+            return LeftDialogSettings->NodePosition.Y < RightDialogSettings->NodePosition.Y;
+        }
+        return false;
+    });
+
+    const int32* FindID = TargetNode->OutNodes.FindByPredicate([&](int32 IDNode)
+    {
+        const URPG_DialogSettingsObject* DialogSettings = FindNodeByIndex(IDNode);
+        return DialogSettings && DialogSettings->IsValidCondition();
+    });
+
+    return FindID ? FindNodeByIndex(*FindID) : nullptr;
+}
+
+void URPG_DialogObjectBase::ResetDialog()
+{
+    TargetIDNode = INDEX_NONE;
+    OwnerPC = nullptr;
 }
 
 void URPG_DialogObjectBase::Serialize(FArchive& Ar)
@@ -103,6 +139,7 @@ bool URPG_DialogObjectBase::IsSomeHaveOutPlayerNode(const TArray<int32>& OutNode
 
 void URPG_DialogObjectBase::RemoveIndexNode(int32 IndexNode)
 {
+#if UE_EDITOR
     URPG_DialogSettingsObject* DialogSettingsObject = FindNodeByIndex(IndexNode);
     if (!DialogSettingsObject) return;
 
@@ -113,7 +150,10 @@ void URPG_DialogObjectBase::RemoveIndexNode(int32 IndexNode)
 
     ArrayDialogNode.Remove(DialogSettingsObject);
     DialogSettingsObject->MarkAsGarbage();
+#endif
 }
+
+#if WITH_EDITOR
 
 URPG_DialogSettingsObject* URPG_DialogObjectBase::CreateNewDialogNode(const ERPG_TypeStateDialog& TypeStateDialog, FVector2D NodePosition)
 {
@@ -158,5 +198,7 @@ int32 URPG_DialogObjectBase::GetFreeIndexNumSlot() const
     }
     return INDEX_NONE;
 }
+
+#endif
 
 #pragma endregion

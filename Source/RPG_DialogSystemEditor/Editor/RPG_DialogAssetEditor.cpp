@@ -272,7 +272,7 @@ void FRPG_DialogAssetEditor::DeleteSelectedNodes()
             const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
             if (!DialogGraphNode) continue;
 
-            URPG_DialogSettingsObject* DialogSettingsObject = DialogGraphNode->GetDialogSettingsObject();
+            const URPG_DialogSettingsObject* DialogSettingsObject = DialogGraphNode->GetDialogSettingsObject();
             if (!DialogSettingsObject) continue;
 
             DialogBeingEdited->RemoveIndexNode(DialogSettingsObject->IndexNode);
@@ -298,7 +298,7 @@ bool FRPG_DialogAssetEditor::CanDeleteNodes() const
         const URPG_DialogGraphNode_Base* Node = Cast<URPG_DialogGraphNode_Base>(*NodeIt);
         if (!Node) continue;
 
-        URPG_DialogSettingsObject* DialogSettingsObject = Node->GetDialogSettingsObject();
+        const URPG_DialogSettingsObject* DialogSettingsObject = Node->GetDialogSettingsObject();
         if (!DialogSettingsObject) continue;
         
         if (DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::Entry || DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::None)

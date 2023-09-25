@@ -76,6 +76,12 @@ public:
     UFUNCTION(BlueprintCallable)
     int32 GetIndexTransferNode() const;
 
+    UFUNCTION(BlueprintCallable)
+    bool IsValidCondition() const;
+
+    UFUNCTION(BlueprintCallable)
+    void ExecuteEvents();
+    
 #pragma endregion
 
 #pragma region DataDialog

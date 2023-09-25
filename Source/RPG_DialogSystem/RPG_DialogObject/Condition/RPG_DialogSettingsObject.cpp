@@ -58,5 +58,25 @@ int32 URPG_DialogSettingsObject::GetIndexTransferNode() const
     return INDEX_NONE;
 }
 
+bool URPG_DialogSettingsObject::IsValidCondition() const
+{
+    for (auto Cond : ArrayCondition)
+    {
+        if (!Cond->IsCondition())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void URPG_DialogSettingsObject::ExecuteEvents()
+{
+    for (const auto Event : ArrayEvent)
+    {
+        Event->TriggerEvent();
+    }
+}
+
 #pragma endregion
 
