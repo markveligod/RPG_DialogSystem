@@ -14,6 +14,8 @@ class RPG_DIALOGSYSTEM_API URPG_DialogObjectBase : public UObject
 {
     GENERATED_BODY()
 
+friend class URPG_DialogComponentBase;
+    
 #pragma region Default
 
 public:
@@ -91,6 +93,18 @@ public:
     /** @public  **/
     void RemoveIndexNode(int32 IndexNode);
 
+    /** @public  **/
+    UFUNCTION(Blueprintable)
+    bool IsNetworkUpdate() const { return bNetworkUpdate; }
+
+    /** @public  **/
+    UFUNCTION(Blueprintable)
+    void EnableNetworkUpdate() { bNetworkUpdate = true; }
+
+    /** @public  **/
+    UFUNCTION(Blueprintable)
+    void ResetNetworkUpdate() { bNetworkUpdate = false; }
+
 #if WITH_EDITOR
 
 public:
@@ -109,17 +123,23 @@ private:
 
 #pragma region DataDialog
 
-private:
-    /** @private Array of dialog nodes **/
+protected:
+
+    /** @protected Array of dialog nodes **/
     UPROPERTY(SaveGame, Replicated)
     TArray<URPG_DialogSettingsObject*> ArrayDialogNode;
 
-    /** @private Owner player controller **/
+    /** @protected Owner player controller **/
     UPROPERTY()
     APlayerController* OwnerPC{nullptr};
 
-    /** @private Owner player controller **/
+    /** @protected Owner player controller **/
     int32 TargetIDNode{INDEX_NONE};
 
+private:
+
+    /** @private **/
+    bool bNetworkUpdate{false};
+    
 #pragma endregion
 };

@@ -71,3 +71,5 @@ inline bool ClogPrint(bool Cond, TCHAR* NameFunction, const FString& Text)
     }
 
 #define CLOG_DIALOG_SYSTEM(Cond, Format, ...) DialogSystemSpace::ClogPrint(Cond, ANSI_TO_TCHAR(__FUNCTION__), FString::Printf(TEXT(Format), ##__VA_ARGS__))
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateTargetDialogSignature, class URPG_DialogObjectBase*, DialogObject);
