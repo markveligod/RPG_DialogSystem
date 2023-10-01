@@ -13,7 +13,6 @@ public class RPG_DialogSystem : ModuleRules
         });
 
         PrivateIncludePaths.AddRange(new string[] {// ... add other private include paths required here ...
-            "RPG_DialogSystem"
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {

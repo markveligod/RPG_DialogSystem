@@ -1,3 +1,3 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RPG_Library/RPG_DialogFunctionLibrary.h"
+#include "RPG_DialogSystem/RPG_Library/RPG_DialogFunctionLibrary.h"

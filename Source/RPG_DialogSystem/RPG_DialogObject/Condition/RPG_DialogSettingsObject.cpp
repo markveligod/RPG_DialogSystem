@@ -1,25 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
-#include "RPG_DialogObject/RPG_DialogObjectBase.h"
+#include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
+#include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 
 #pragma region ActionDialogEvent
 
-void URPG_DialogEvent::TriggerEvent()
+void URPG_DialogEvent::TriggerEvent(APlayerController* PC)
 {
-    Trigger_Event();
+    Trigger_Event(PC);
 }
 
 #pragma endregion
 
 #pragma region ActionDialogTask
 
-bool URPG_DialogCondition::IsCondition()
+bool URPG_DialogCondition::IsCondition(APlayerController* PC)
 {
-    return IsConditionNative();
+    return IsConditionNative(PC);
 }
 
-bool URPG_DialogCondition::IsConditionNative_Implementation()
+bool URPG_DialogCondition::IsConditionNative_Implementation(APlayerController* PC)
 {
     return true;
 }
@@ -58,11 +58,11 @@ int32 URPG_DialogSettingsObject::GetIndexTransferNode() const
     return INDEX_NONE;
 }
 
-bool URPG_DialogSettingsObject::IsValidCondition() const
+bool URPG_DialogSettingsObject::IsValidCondition(APlayerController* PlayerController) const
 {
     for (auto Cond : ArrayCondition)
     {
-        if (!Cond->IsCondition())
+        if (!Cond->IsCondition(PlayerController))
         {
             return false;
         }
@@ -70,11 +70,11 @@ bool URPG_DialogSettingsObject::IsValidCondition() const
     return true;
 }
 
-void URPG_DialogSettingsObject::ExecuteEvents()
+void URPG_DialogSettingsObject::ExecuteEvents(APlayerController* PlayerController)
 {
     for (const auto Event : ArrayEvent)
     {
-        Event->TriggerEvent();
+        Event->TriggerEvent(PlayerController);
     }
 }
 

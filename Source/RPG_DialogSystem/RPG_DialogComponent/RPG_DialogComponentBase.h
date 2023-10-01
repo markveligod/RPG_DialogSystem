@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "RPG_DialogSystemDataTypes.h"
+#include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
 #include "RPG_DialogComponentBase.generated.h"
 
 class URPG_DialogObjectBase;
@@ -38,10 +38,27 @@ protected:
 
 public:
 
-    /** @public **/
+    /** @public  **/
+    UFUNCTION(BlueprintCallable)
+    void RunDialog(const TSoftObjectPtr<URPG_DialogObjectBase>& DialogObject);
+
+    /** @public  **/
+    UFUNCTION(BlueprintCallable)
+    URPG_DialogObjectBase* GetTargetDialog() const { return TargetDialog; }
+
+    /** @public  **/
     UFUNCTION()
     void OnRep_TargetDialog();
 
+private:
+
+    /** @private **/
+    UFUNCTION(Server, Reliable, WithValidation)
+    void ServerRunDialog(const FString& ObjectPath);
+
+    /** @private **/
+    void RegisterCompleteObject(URPG_DialogObjectBase* DialogObject);
+    
 #pragma endregion
     
 #pragma region Data

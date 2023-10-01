@@ -9,7 +9,7 @@
 /**
  *
  */
-UCLASS(DisplayName = "DialogEvent", EditInlineNew)
+UCLASS(DisplayName = "DialogEvent", EditInlineNew, Abstract, Blueprintable)
 class RPG_DIALOGSYSTEM_API URPG_DialogEvent : public UObject
 {
     GENERATED_BODY()
@@ -17,11 +17,11 @@ class RPG_DIALOGSYSTEM_API URPG_DialogEvent : public UObject
 #pragma region Action
 
 public:
-    virtual void TriggerEvent();
+    virtual void TriggerEvent(APlayerController* PC);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)
-    void Trigger_Event();
+    void Trigger_Event(APlayerController* PC);
 
 #pragma endregion
 };
@@ -29,7 +29,7 @@ protected:
 /**
  *
  */
-UCLASS(DisplayName = "DialogCondition", EditInlineNew)
+UCLASS(DisplayName = "DialogCondition", EditInlineNew, Abstract, Blueprintable)
 class RPG_DIALOGSYSTEM_API URPG_DialogCondition : public UObject
 {
     GENERATED_BODY()
@@ -37,11 +37,11 @@ class RPG_DIALOGSYSTEM_API URPG_DialogCondition : public UObject
 #pragma region Action
 
 public:
-    virtual bool IsCondition();
+    virtual bool IsCondition(APlayerController* PC);
 
 protected:
     UFUNCTION(BlueprintNativeEvent)
-    bool IsConditionNative();
+    bool IsConditionNative(APlayerController* PC);
 
 #pragma endregion
 };
@@ -77,10 +77,10 @@ public:
     int32 GetIndexTransferNode() const;
 
     UFUNCTION(BlueprintCallable)
-    bool IsValidCondition() const;
+    bool IsValidCondition(APlayerController* PlayerController) const;
 
     UFUNCTION(BlueprintCallable)
-    void ExecuteEvents();
+    void ExecuteEvents(APlayerController* PlayerController);
     
 #pragma endregion
 

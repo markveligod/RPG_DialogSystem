@@ -9,7 +9,7 @@
 /**
  * @class Dialog object for storing nodes
  */
-UCLASS()
+UCLASS(BlueprintType)
 class RPG_DIALOGSYSTEM_API URPG_DialogObjectBase : public UObject
 {
     GENERATED_BODY()
@@ -21,17 +21,6 @@ friend class URPG_DialogComponentBase;
 public:
 
     URPG_DialogObjectBase();
-    
-    /** @public Initialization of internal parameters **/
-    UFUNCTION(BlueprintCallable)
-    virtual bool InitDialog(APlayerController* PlayerController);
-
-    /** @public Get next dialog settings **/
-    UFUNCTION(BlueprintCallable)
-    URPG_DialogSettingsObject* NextDialog();
-
-    UFUNCTION(BlueprintCallable)
-    void ResetDialog();
     
     /**
      * Handles reading, writing, and reference collecting using FArchive.
@@ -74,6 +63,18 @@ public:
 #pragma region Action
 
 public:
+
+    /** @public Initialization of internal parameters **/
+    UFUNCTION(BlueprintCallable)
+    virtual bool InitDialog(APlayerController* PlayerController);
+
+    /** @public Get next dialog settings **/
+    UFUNCTION(BlueprintCallable)
+    void NextDialog();
+
+    UFUNCTION(BlueprintCallable)
+    void ResetDialog();
+    
     /** @public Node search by index **/
     UFUNCTION(BlueprintCallable)
     URPG_DialogSettingsObject* FindNodeByIndex(int32 IndexNode);
@@ -105,6 +106,26 @@ public:
     UFUNCTION(Blueprintable)
     void ResetNetworkUpdate() { bNetworkUpdate = false; }
 
+    /** @public  **/
+    UFUNCTION()
+    void OnRep_TargetIDNode();
+    
+private:
+
+    /** @private  **/
+    UFUNCTION(Server, Reliable, WithValidation)
+    void ServerNextDialog();
+
+    /** @private  **/
+    UFUNCTION(Server, Reliable, WithValidation)
+    void ServerPushNextNodeDialog(int32 IDNode);
+
+    /** @private  **/
+    void PushNextNodeDialog(int32 IDNode);
+    
+    /** @private Complete Dialog **/
+    void CompleteDialog();
+    
 #if WITH_EDITOR
 
 public:
@@ -134,6 +155,7 @@ protected:
     APlayerController* OwnerPC{nullptr};
 
     /** @protected Owner player controller **/
+    UPROPERTY(ReplicatedUsing=OnRep_TargetIDNode)
     int32 TargetIDNode{INDEX_NONE};
 
 private:
@@ -141,5 +163,18 @@ private:
     /** @private **/
     bool bNetworkUpdate{false};
     
+#pragma endregion
+
+#pragma region Signature
+
+public:
+
+    UPROPERTY(BlueprintAssignable)
+    FNextNodeDialogSignature OnNextNodeDialog;
+    
+private:
+
+    FCompleteDialogSignature OnCompleteDialog;
+
 #pragma endregion
 };

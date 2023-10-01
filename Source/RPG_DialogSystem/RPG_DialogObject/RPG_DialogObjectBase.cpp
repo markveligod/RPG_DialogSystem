@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RPG_DialogObject/RPG_DialogObjectBase.h"
+#include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "Condition/RPG_DialogSettingsObject.h"
 #include "Net/UnrealNetwork.h"
 
@@ -17,50 +17,6 @@ URPG_DialogObjectBase::URPG_DialogObjectBase()
         CreateNewDialogNode(ERPG_TypeStateDialog::Entry, FVector2D::ZeroVector);
     }
 #endif
-}
-
-bool URPG_DialogObjectBase::InitDialog(APlayerController* PlayerController)
-{
-    if (CLOG_DIALOG_SYSTEM(PlayerController == nullptr, "Player controller is nullptr")) return false;
-    OwnerPC = PlayerController;
-
-    const URPG_DialogSettingsObject* DialogSettingsObject = FindStartNode();
-    if (CLOG_DIALOG_SYSTEM(DialogSettingsObject == nullptr, "Start node is nullptr")) return false;
-    TargetIDNode = DialogSettingsObject->IndexNode;
-
-    return true;
-}
-
-URPG_DialogSettingsObject* URPG_DialogObjectBase::NextDialog()
-{
-    URPG_DialogSettingsObject* TargetNode = FindNodeByIndex(TargetIDNode);
-    if (CLOG_DIALOG_SYSTEM(TargetNode == nullptr, "Target node is nullptr")) return nullptr;
-    TargetNode->ExecuteEvents();
-
-    TargetNode->OutNodes.Sort([&](int32 LeftID, int32 RightID)
-    {
-        const URPG_DialogSettingsObject* LeftDialogSettings = FindNodeByIndex(LeftID);
-        const URPG_DialogSettingsObject* RightDialogSettings = FindNodeByIndex(RightID);
-        if (LeftDialogSettings && RightDialogSettings)
-        {
-            return LeftDialogSettings->NodePosition.Y < RightDialogSettings->NodePosition.Y;
-        }
-        return false;
-    });
-
-    const int32* FindID = TargetNode->OutNodes.FindByPredicate([&](int32 IDNode)
-    {
-        const URPG_DialogSettingsObject* DialogSettings = FindNodeByIndex(IDNode);
-        return DialogSettings && DialogSettings->IsValidCondition();
-    });
-
-    return FindID ? FindNodeByIndex(*FindID) : nullptr;
-}
-
-void URPG_DialogObjectBase::ResetDialog()
-{
-    TargetIDNode = INDEX_NONE;
-    OwnerPC = nullptr;
 }
 
 void URPG_DialogObjectBase::Serialize(FArchive& Ar)
@@ -99,11 +55,57 @@ void URPG_DialogObjectBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME_CONDITION(URPG_DialogObjectBase, ArrayDialogNode, COND_OwnerOnly);
+    DOREPLIFETIME_CONDITION(URPG_DialogObjectBase, TargetIDNode, COND_OwnerOnly);
 }
 
 #pragma endregion
 
 #pragma region Action
+
+bool URPG_DialogObjectBase::InitDialog(APlayerController* PlayerController)
+{
+    if (CLOG_DIALOG_SYSTEM(PlayerController == nullptr, "Player controller is nullptr")) return false;
+    if (CLOG_DIALOG_SYSTEM(!PlayerController->HasAuthority(), "Player controller is not authority")) return false;
+    OwnerPC = PlayerController;
+
+    const URPG_DialogSettingsObject* DialogSettingsObject = FindStartNode();
+    if (CLOG_DIALOG_SYSTEM(DialogSettingsObject == nullptr, "Start node is nullptr")) return false;
+    TargetIDNode = DialogSettingsObject->IndexNode;
+
+    return true;
+}
+
+void URPG_DialogObjectBase::NextDialog()
+{
+    URPG_DialogSettingsObject* TargetNode = FindNodeByIndex(TargetIDNode);
+    if (CLOG_DIALOG_SYSTEM(TargetNode == nullptr, "Target node is nullptr")) return;
+    TargetNode->ExecuteEvents(OwnerPC);
+
+    TargetNode->OutNodes.Sort([&](int32 LeftID, int32 RightID)
+    {
+        const URPG_DialogSettingsObject* LeftDialogSettings = FindNodeByIndex(LeftID);
+        const URPG_DialogSettingsObject* RightDialogSettings = FindNodeByIndex(RightID);
+        if (LeftDialogSettings && RightDialogSettings)
+        {
+            return LeftDialogSettings->NodePosition.Y < RightDialogSettings->NodePosition.Y;
+        }
+        return false;
+    });
+
+    const int32* FindID = TargetNode->OutNodes.FindByPredicate([&](int32 IDNode)
+    {
+        const URPG_DialogSettingsObject* DialogSettings = FindNodeByIndex(IDNode);
+        return DialogSettings && DialogSettings->IsValidCondition(OwnerPC);
+    });
+
+    PushNextNodeDialog(FindID ? *FindID : INDEX_NONE);
+}
+
+void URPG_DialogObjectBase::ResetDialog()
+{
+    TargetIDNode = INDEX_NONE;
+    OwnerPC = nullptr;
+}
 
 URPG_DialogSettingsObject* URPG_DialogObjectBase::FindNodeByIndex(int32 IndexNode)
 {
@@ -151,6 +153,55 @@ void URPG_DialogObjectBase::RemoveIndexNode(int32 IndexNode)
     ArrayDialogNode.Remove(DialogSettingsObject);
     DialogSettingsObject->MarkAsGarbage();
 #endif
+}
+
+void URPG_DialogObjectBase::ServerNextDialog_Implementation()
+{
+    NextDialog();
+}
+
+bool URPG_DialogObjectBase::ServerNextDialog_Validate()
+{
+    return true;
+}
+
+void URPG_DialogObjectBase::ServerPushNextNodeDialog_Implementation(int32 IDNode)
+{
+    
+}
+
+bool URPG_DialogObjectBase::ServerPushNextNodeDialog_Validate(int32 IDNode)
+{
+    return true;
+}
+
+void URPG_DialogObjectBase::OnRep_TargetIDNode()
+{
+    OnNextNodeDialog.Broadcast(FindNodeByIndex(TargetIDNode));
+}
+
+void URPG_DialogObjectBase::PushNextNodeDialog(int32 IDNode)
+{
+    if (CLOG_DIALOG_SYSTEM(OwnerPC == nullptr, "Player controller is nullptr")) return;
+
+    if (OwnerPC->HasAuthority())
+    {
+        TargetIDNode = IDNode;
+        OnNextNodeDialog.Broadcast(FindNodeByIndex(TargetIDNode));
+        if (IDNode == INDEX_NONE)
+        {
+            GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::CompleteDialog);
+        }
+    }
+    else
+    {
+        ServerPushNextNodeDialog(IDNode);
+    }
+}
+
+void URPG_DialogObjectBase::CompleteDialog()
+{
+    OnCompleteDialog.ExecuteIfBound(this);
 }
 
 #if WITH_EDITOR
