@@ -83,6 +83,14 @@ public:
     UFUNCTION(BlueprintCallable)
     URPG_DialogSettingsObject* FindStartNode();
 
+    /** @public Find valid player nodex **/
+    UFUNCTION(BlueprintCallable)
+    TArray<URPG_DialogSettingsObject*> FindValidPlayerNodes(int32 IndexNode);
+
+    /** @public Check node on player **/
+    UFUNCTION(BlueprintCallable)
+    bool IsPlayerNode(int32 IndexNode);
+
     /** @public Get all dialog objects **/
     UFUNCTION(BlueprintCallable)
     const TArray<URPG_DialogSettingsObject*>& GetArrayDialogNode() { return ArrayDialogNode; }

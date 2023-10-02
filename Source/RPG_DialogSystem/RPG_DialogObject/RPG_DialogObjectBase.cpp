@@ -125,6 +125,36 @@ URPG_DialogSettingsObject* URPG_DialogObjectBase::FindStartNode()
     return FindElem ? *FindElem : nullptr;
 }
 
+TArray<URPG_DialogSettingsObject*> URPG_DialogObjectBase::FindValidPlayerNodes(int32 IndexNode)
+{
+    TArray<URPG_DialogSettingsObject*> ArrayResult;
+    if (IsSomeHaveOutPlayerNode({IndexNode}))
+    {
+        if (URPG_DialogSettingsObject* DialogSettings = FindNodeByIndex(IndexNode))
+        {
+            for (int32 Node : DialogSettings->OutNodes)
+            {
+                if (!IsPlayerNode(Node)) continue;
+                URPG_DialogSettingsObject* CheckDialogSettings = FindNodeByIndex(Node);
+                if (!CheckDialogSettings) continue;
+                if (!CheckDialogSettings->IsValidCondition(OwnerPC)) continue;
+                ArrayResult.Add(CheckDialogSettings);
+            }
+        }
+    }
+
+    return ArrayResult;
+}
+
+bool URPG_DialogObjectBase::IsPlayerNode(const int32 IndexNode)
+{
+    if (const URPG_DialogSettingsObject* DialogSettings = FindNodeByIndex(IndexNode))
+    {
+        return DialogSettings->TypeStateDialog == ERPG_TypeStateDialog::PlayerNode;
+    }
+    return false;
+}
+
 bool URPG_DialogObjectBase::IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes)
 {
     for (const int32 NodeID : OutNodes)

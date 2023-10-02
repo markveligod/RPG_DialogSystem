@@ -49,7 +49,7 @@ protected:
 /**
  *
  */
-UCLASS()
+UCLASS(BlueprintType)
 class RPG_DIALOGSYSTEM_API URPG_DialogSettingsObject : public UObject
 {
     GENERATED_BODY()
@@ -63,6 +63,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     const FText& GetTextDialog() const { return TextDialog; }
+
+    UFUNCTION(BlueprintCallable)
+    int32 GetIndexNode() const { return IndexNode; }
 
     UFUNCTION(BlueprintCallable)
     bool IsHaveSomeCondition() const { return ArrayCondition.Num() != 0; }
