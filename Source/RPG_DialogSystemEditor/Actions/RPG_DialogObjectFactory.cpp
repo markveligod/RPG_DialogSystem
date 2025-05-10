@@ -1,6 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RPG_DialogObjectFactory.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogSystemEditor/RPG_DialogSystemEditor.h"

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "RPG_DialogSystem/RPG_DialogSystemDataTypes.h"
+#include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
 #include "RPG_DialogComponentBase.generated.h"
 
 class URPG_DialogObjectBase;
@@ -14,9 +14,8 @@ class RPG_DIALOGSYSTEM_API URPG_DialogComponentBase : public UActorComponent
     GENERATED_BODY()
 
 #pragma region Default
-    
+
 public:
-    
     // Sets default values for this component's properties
     URPG_DialogComponentBase();
 
@@ -25,10 +24,7 @@ public:
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-    virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
-    
 protected:
-    
     // Called when the game starts
     virtual void BeginPlay() override;
 
@@ -37,7 +33,6 @@ protected:
 #pragma region Action
 
 public:
-
     /** @public  **/
     UFUNCTION(BlueprintCallable)
     void RunDialog(const TSoftObjectPtr<URPG_DialogObjectBase>& DialogObject);
@@ -51,22 +46,20 @@ public:
     void OnRep_TargetDialog();
 
 private:
-
     /** @private **/
     UFUNCTION(Server, Reliable, WithValidation)
     void ServerRunDialog(const FString& ObjectPath);
 
     /** @private **/
     void RegisterCompleteObject(URPG_DialogObjectBase* DialogObject);
-    
+
 #pragma endregion
-    
+
 #pragma region Data
 
 private:
-
     /** @private **/
-    UPROPERTY(ReplicatedUsing=OnRep_TargetDialog)
+    UPROPERTY(ReplicatedUsing = OnRep_TargetDialog)
     URPG_DialogObjectBase* TargetDialog{nullptr};
 
 #pragma endregion
@@ -74,14 +67,8 @@ private:
 #pragma region Signature
 
 protected:
-
     /** @private **/
     virtual void NotifyUpdateTargetDialog();
-    
-    /** @private **/
-    UPROPERTY(BlueprintAssignable)
-    FUpdateTargetDialogSignature OnUpdateTargetDialog;
-    
+
 #pragma endregion
-    
 };

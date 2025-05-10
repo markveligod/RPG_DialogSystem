@@ -4,43 +4,43 @@
 #include "RPG_DialogGraphActions.generated.h"
 
 USTRUCT()
-struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewNPCNode : public FEdGraphSchemaAction
+struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewWorkNode : public FEdGraphSchemaAction
 {
     GENERATED_BODY()
 
-    FRPG_DialogAction_NewNPCNode() : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create NPC Node")), FText::FromString(TEXT("Generates a new NPC node")), 0)
+    FRPG_DialogAction_NewWorkNode()
+        : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create Work Node")), FText::FromString(TEXT("Generates a new Work node")), 0)
     {
-        
     }
 
     virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
-    
+
     virtual FName GetTypeId() const override { return StaticGetTypeId(); }
 
     static const FName& StaticGetTypeId()
     {
-        static FName Type("FDialogEditorGraphSchemaAction_NewNPCNode");
+        static FName Type("FDialogEditorGraphSchemaAction_NewWorkNode");
         return Type;
     }
 };
 
 USTRUCT()
-struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewPlayerNode : public FEdGraphSchemaAction
+struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewFinishNode : public FEdGraphSchemaAction
 {
     GENERATED_BODY()
 
-    FRPG_DialogAction_NewPlayerNode() : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create Player Node")), FText::FromString(TEXT("Generates a new Player node")), 0)
+    FRPG_DialogAction_NewFinishNode()
+        : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create Finish Node")), FText::FromString(TEXT("Generates a new Finish node")), 0)
     {
-        
     }
 
     virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
-    
+
     virtual FName GetTypeId() const override { return StaticGetTypeId(); }
 
     static const FName& StaticGetTypeId()
     {
-        static FName Type("FDialogEditorGraphSchemaAction_NewPlayerNode");
+        static FName Type("FDialogEditorGraphSchemaAction_NewFinishNode");
         return Type;
     }
 };
@@ -50,13 +50,13 @@ struct RPG_DIALOGSYSTEMEDITOR_API FRPG_DialogAction_NewTransferNode : public FEd
 {
     GENERATED_BODY()
 
-    FRPG_DialogAction_NewTransferNode() : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create Transfer Node")), FText::FromString(TEXT("Generates a new Transfer node")), 0)
+    FRPG_DialogAction_NewTransferNode()
+        : FEdGraphSchemaAction(FText::FromString(TEXT("Action Graph")), FText::FromString(TEXT("Create Transfer Node")), FText::FromString(TEXT("Generates a new Transfer node")), 0)
     {
-        
     }
 
     virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
-    
+
     virtual FName GetTypeId() const override { return StaticGetTypeId(); }
 
     static const FName& StaticGetTypeId()

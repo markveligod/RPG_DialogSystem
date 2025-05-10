@@ -1,11 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RPG_DialogSystem/RPG_DialogComponent/RPG_DialogComponentBase.h"
-#include "JsonObjectConverter.h"
 #include "Engine/ActorChannel.h"
 #include "Net/UnrealNetwork.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
-#include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
 
 #if !UE_BUILD_SHIPPING
 
@@ -45,18 +43,18 @@ void URPG_DialogComponentBase::TickComponent(float DeltaTime, ELevelTick TickTyp
         Result.Append(FString::Printf(TEXT("TargetDialog: [%s]\n"), *GetNameSafe(TargetDialog)));
         if (TargetDialog)
         {
-            if (URPG_DialogSettingsObject* TargetDialogSettings = TargetDialog->FindNodeByIndex(TargetDialog->TargetIDNode))
-            {
-                Result.Append(FString::Printf(TEXT("Index node: [%i]\n"), TargetDialogSettings->IndexNode));
-                Result.Append(FString::Printf(TEXT("NodePosition: [%s]\n"), *TargetDialogSettings->NodePosition.ToString()));
-                Result.Append(FString::Printf(TEXT("TypeStateDialog: [%s]\n"), *UEnum::GetValueAsString(TargetDialogSettings->TypeStateDialog)));
-                Result.Append(FString(TEXT("Out Node: ")));
-                for (const int32 IDNode : TargetDialogSettings->OutNodes)
-                {
-                    Result.Append(FString::FromInt(IDNode));
-                }
-                Result.Append(TEXT("\n"));
-            }
+            // if (URPG_DialogSettingsObject* TargetDialogSettings = TargetDialog->FindNodeByIndex(TargetDialog->TargetIDNode))
+            // {
+            //     Result.Append(FString::Printf(TEXT("Index node: [%i]\n"), TargetDialogSettings->IndexNode));
+            //     Result.Append(FString::Printf(TEXT("NodePosition: [%s]\n"), *TargetDialogSettings->NodePosition.ToString()));
+            //     Result.Append(FString::Printf(TEXT("TypeStateDialog: [%s]\n"), *UEnum::GetValueAsString(TargetDialogSettings->TypeStateDialog)));
+            //     Result.Append(FString(TEXT("Out Node: ")));
+            //     for (const int32 IDNode : TargetDialogSettings->OutNodes)
+            //     {
+            //         Result.Append(FString::FromInt(IDNode));
+            //     }
+            //     Result.Append(TEXT("\n"));
+            // }
         }
     }
 
@@ -70,26 +68,10 @@ void URPG_DialogComponentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
     DOREPLIFETIME_CONDITION_NOTIFY(URPG_DialogComponentBase, TargetDialog, COND_OwnerOnly, REPNOTIFY_Always);
 }
 
-bool URPG_DialogComponentBase::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
-{
-    bool bState = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
-    if (TargetDialog && TargetDialog->IsNetworkUpdate())
-    {
-        TargetDialog->ResetDialog();
-        bState |= Channel->ReplicateSubobject(TargetDialog, *Bunch, *RepFlags);
-        
-        // ReSharper disable once CppDeprecatedEntity
-        bState |= Channel->ReplicateSubobjectList(TargetDialog->ArrayDialogNode, *Bunch, *RepFlags);
-    }
-    return bState;
-}
-
 // Called when the game starts
 void URPG_DialogComponentBase::BeginPlay()
 {
     Super::BeginPlay();
-
-
 }
 
 #pragma endregion
@@ -133,7 +115,7 @@ void URPG_DialogComponentBase::ServerRunDialog_Implementation(const FString& Obj
     RunDialog(TSoftObjectPtr<URPG_DialogObjectBase>(ObjectPath));
 }
 
-bool URPG_DialogComponentBase::ServerRunDialog_Validate(const FString&  ObjectPath)
+bool URPG_DialogComponentBase::ServerRunDialog_Validate(const FString& ObjectPath)
 {
     return !ObjectPath.IsEmpty();
 }
@@ -144,7 +126,7 @@ bool URPG_DialogComponentBase::ServerRunDialog_Validate(const FString&  ObjectPa
 
 void URPG_DialogComponentBase::NotifyUpdateTargetDialog()
 {
-    OnUpdateTargetDialog.Broadcast(TargetDialog);
+    // OnUpdateTargetDialog.Broadcast(TargetDialog);
 }
 
 #pragma endregion

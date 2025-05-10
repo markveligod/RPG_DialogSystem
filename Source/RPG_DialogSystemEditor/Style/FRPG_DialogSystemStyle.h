@@ -6,10 +6,8 @@
 class FRPG_DialogSystemStyle
 {
 public:
-
     static void Initialize();
     static void Shutdown();
-
 
     static FName GetIconEvent();
     static FName GetIconCondition();
@@ -17,13 +15,8 @@ public:
     static FORCEINLINE const FName& GetStyleSetName() { return StyleSet->GetStyleSetName(); }
     static FORCEINLINE TSharedPtr<ISlateStyle> Get() { return StyleSet; }
 
-    static const FSlateBrush* GetBrush(FName PropertyName, const ANSICHAR* Specifier = nullptr)
-    {
-        return Get()->GetBrush(PropertyName, Specifier);
-    }
-
+    static const FSlateBrush* GetBrush(FName PropertyName, const ANSICHAR* Specifier = nullptr) { return Get()->GetBrush(PropertyName, Specifier); }
 
 private:
-
     static TSharedPtr<FSlateStyleSet> StyleSet;
 };

@@ -12,7 +12,6 @@ class URPG_DialogObjectBase;
 class FRPG_DialogAssetEditor : public FAssetEditorToolkit, public FEditorUndoClient, FGCObject
 {
 public:
-    
     FRPG_DialogAssetEditor();
     virtual ~FRPG_DialogAssetEditor();
 
@@ -58,10 +57,10 @@ protected:
 
     virtual void DeleteSelectedNodes();
     virtual bool CanDeleteNodes() const;
-    
+
 private:
     /** The object we're currently editing */
-    URPG_DialogObjectBase* DialogBeingEdited{nullptr};
+    TObjectPtr<URPG_DialogObjectBase> DialogBeingEdited{nullptr};
     /** Properties tab */
     TSharedPtr<class IDetailsView> DialogProperties;
 

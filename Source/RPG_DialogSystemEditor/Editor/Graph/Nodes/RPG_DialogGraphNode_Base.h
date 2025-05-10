@@ -6,11 +6,13 @@
 #include "EdGraph/EdGraphNode.h"
 #include "RPG_DialogGraphNode_Base.generated.h"
 
-class URPG_DialogSettingsObject;
+class URPG_DialogPlayer;
+class URPG_DialogNodeWork;
+class URPG_DialogNodeBase;
 class URPG_DialogObjectBase;
 class SDialogGraphNode;
 /**
- * 
+ *
  */
 UCLASS()
 class RPG_DIALOGSYSTEMEDITOR_API URPG_DialogGraphNode_Base : public UEdGraphNode
@@ -18,9 +20,9 @@ class RPG_DIALOGSYSTEMEDITOR_API URPG_DialogGraphNode_Base : public UEdGraphNode
     GENERATED_BODY()
 
 public:
-
     URPG_DialogGraphNode_Base();
 
+    virtual void InitNode(const URPG_DialogNodeBase* InObject);
     virtual bool CanUserDeleteNode() const override { return true; }
     virtual bool CanDuplicateNode() const override { return false; }
 #pragma region EdGraphNodeInterface
@@ -43,31 +45,67 @@ public:
 #pragma region DataNode
 
 public:
-
-    int32 TargetIndexTaskNode{INDEX_NONE};
-
-    UEdGraphPin* OutputPin{nullptr};
-    UEdGraphPin* InPin{nullptr};
+    /** @public **/
+    int32 GetTargetIndexNode() const { return TargetIndexNode; }
 
 private:
-    
+    /** @private **/
+    int32 TargetIndexNode{INDEX_NONE};
+
+    /** @private **/
     TSharedPtr<SDialogGraphNode> DialogSGraphNode;
+
 #pragma endregion
 
 #pragma region ActionNode
 
 public:
+    /** @public **/
+    URPG_DialogNodeBase* GetOwnerNode() const;
 
-    URPG_DialogSettingsObject* GetDialogSettingsObject() const;
+    /** @public **/
+    UEdGraphPin* GetInputPin() const;
 
-    void MakeLink(const URPG_DialogGraphNode_Base* To) const;
+    /** @public **/
+    UEdGraphPin* GetOutputPin() const;
+
+    /** @public **/
+    void AutoConnectionPins(bool bMarkDirty = true) const;
 
 protected:
+    /** @protected **/
+    URPG_DialogGraphNode_Base* FindGraphNode(int32 TargetIndex) const;
 
+    /** @protected **/
     URPG_DialogObjectBase* GetDialogObject() const;
 
+    /** @protected **/
+    UEdGraphPin* GetOutputPinByIndexWork(int32 IndexWork) const;
+
+    /** @protected **/
+    URPG_DialogPlayer* GetDialogPlayerByIndexPin(int32 IndexPin) const;
+
+    /** @protected **/
     virtual void DialogGraphNode_EditChangeProperty(UObject* Object, struct FPropertyChangedEvent& PropertyChangedEvent);
-    
+
+    /** @protected **/
+    void RebuildOutputPins();
+
+    /** @protected **/
+    void RemoveOutputPins();
+
+    /** @protected **/
+    TArray<UEdGraphPin*> GetOutputPins();
+
+    /** @protected Break all output links on this node */
+    void BreakAllOutputNodeLinks(bool bAlwaysMarkDirty = true);
+
+private:
+    /** @public **/
+    FText GetNodeTitle(URPG_DialogNodeBase* Node) const;
+
+    /** @private **/
+    void MakeWorkOutputPins(URPG_DialogNodeWork* NodeWork);
+
 #pragma endregion
-    
 };

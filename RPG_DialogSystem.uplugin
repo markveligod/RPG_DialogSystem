@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
+	"VersionName": "2.0",
 	"FriendlyName": "RPG_DialogSystem",
 	"Description": "A simple dialogue system in the style of the RPG genre",
 	"Category": "Other",

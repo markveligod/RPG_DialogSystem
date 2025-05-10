@@ -3,41 +3,6 @@
 #include "CoreMinimal.h"
 #include "RPG_DialogSystemDataTypes.generated.h"
 
-class URPG_DialogSettingsObject;
-
-UENUM(BlueprintType)
-enum class ERPG_TypeStateDialog : uint8
-{
-    None UMETA(Hidden),
-    Entry,
-    NPCNode,
-    PlayerNode,
-    Transfer,
-};
-
-USTRUCT(BlueprintType)
-struct FRPG_DialogNode
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere)
-    int32 IndexNode{INDEX_NONE};
-
-    UPROPERTY(EditAnywhere)
-    FVector2D NodePosition{FVector2D::UnitVector};
-
-    UPROPERTY(EditAnywhere)
-    ERPG_TypeStateDialog TypeStateDialog{ERPG_TypeStateDialog::None};
-
-    UPROPERTY(EditAnywhere)
-    URPG_DialogSettingsObject* DialogSettingsObject{nullptr};
-
-    UPROPERTY(EditAnywhere)
-    TArray<int32> OutNodes;
-
-    bool operator==(const FRPG_DialogNode& Node) const { return Node.IndexNode == this->IndexNode; }
-};
-
 DECLARE_LOG_CATEGORY_CLASS(LogDialogSystem, All, All);
 
 namespace DialogSystemSpace
@@ -46,7 +11,10 @@ inline bool IsLogPrint()
 {
 #if !UE_BUILD_SHIPPING
     const auto DialogSystemShowLog = IConsoleManager::Get().FindConsoleVariable(TEXT("DialogSystem.ShowLog"));
-    return DialogSystemShowLog ? DialogSystemShowLog->GetBool() : false;
+    if (DialogSystemShowLog)
+    {
+        return DialogSystemShowLog->GetBool();
+    }
 #endif
     return false;
 }
@@ -66,12 +34,23 @@ inline bool ClogPrint(bool Cond, TCHAR* NameFunction, const FString& Text)
         if (DialogSystemSpace::IsLogPrint())                                                                                                                                                           \
         {                                                                                                                                                                                              \
             const FString Msg = FString::Printf(TEXT(Format), ##__VA_ARGS__);                                                                                                                          \
-            UE_LOG(LogDialogSystem, Verbosity, TEXT("[%s] | TEXT:[%s]"), ANSI_TO_TCHAR(__FUNCTION__), *Text);                                                                                          \
+            UE_LOG(LogDialogSystem, Verbosity, TEXT("[%s] | TEXT:[%s]"), ANSI_TO_TCHAR(__FUNCTION__), *Msg);                                                                                           \
         }                                                                                                                                                                                              \
     }
 
 #define CLOG_DIALOG_SYSTEM(Cond, Format, ...) DialogSystemSpace::ClogPrint(Cond, ANSI_TO_TCHAR(__FUNCTION__), FString::Printf(TEXT(Format), ##__VA_ARGS__))
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateTargetDialogSignature, class URPG_DialogObjectBase*, DialogObject);
-DECLARE_DELEGATE_OneParam(FCompleteDialogSignature, class URPG_DialogObjectBase*);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNextNodeDialogSignature, class URPG_DialogSettingsObject*, DialogSettingsObject);
+class URPG_DialogObjectBase;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateTargetDialogSignature, URPG_DialogObjectBase*, DialogObject);
+DECLARE_DELEGATE_OneParam(FCompleteDialogSignature, URPG_DialogObjectBase*);
+
+UENUM(BlueprintType)
+enum class ERPG_TypeDialogNode : uint8
+{
+    None = 0,
+    Start,
+    Work,
+    Finish,
+    Transfer,
+};
