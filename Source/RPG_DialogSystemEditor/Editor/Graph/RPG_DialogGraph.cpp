@@ -47,3 +47,32 @@ UEdGraphNode* URPG_DialogGraph::CreateNode(FVector2D Pos, ERPG_TypeDialogNode Ty
     }
     return nullptr;
 }
+
+#if WITH_EDITOR
+
+bool URPG_DialogGraph::Modify(bool bAlwaysMarkDirty)
+{
+    bool bSavedToTransactionBuffer = false;
+
+    if (CanModify())
+    {
+        // Do not consider script packages, as they should never end up in the
+        // transaction buffer and we don't want to mark them dirty here either.
+        // We do want to consider PIE objects however
+        if (GetOutermost()->HasAnyPackageFlags(PKG_ContainsScript | PKG_CompiledIn) == false || GetClass()->HasAnyClassFlags(CLASS_DefaultConfig | CLASS_Config))
+        {
+            // If we failed to save to the transaction buffer, but the user requested the package
+            // marked dirty anyway, do so
+            if (!bSavedToTransactionBuffer && bAlwaysMarkDirty)
+            {
+                MarkPackageDirty();
+            }
+        }
+
+        FCoreUObjectDelegates::BroadcastOnObjectModified(this);
+    }
+
+    return bSavedToTransactionBuffer;
+}
+
+#endif

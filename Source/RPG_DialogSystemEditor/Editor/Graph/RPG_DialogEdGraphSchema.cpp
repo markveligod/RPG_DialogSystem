@@ -62,7 +62,7 @@ void URPG_DialogEdGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 
 void URPG_DialogEdGraphSchema::AutoConnectNodeByDefault(UEdGraph& Graph) const
 {
-    for (auto Node : Graph.Nodes)
+    for (auto& Node : Graph.Nodes)
     {
         const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node.Get());
         if (!DialogGraphNode) continue;

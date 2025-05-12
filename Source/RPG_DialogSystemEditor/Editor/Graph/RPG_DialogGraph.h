@@ -22,4 +22,9 @@ public:
     virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
     virtual UEdGraphNode* CreateNode(FVector2D Pos, ERPG_TypeDialogNode TypeNode);
+
+#if WITH_EDITOR
+
+    virtual bool Modify(bool bAlwaysMarkDirty = true) override;
+#endif
 };

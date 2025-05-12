@@ -87,6 +87,9 @@ public:
     /** @public **/
     virtual void RemoveNode(const int32 IndexNode);
 
+    /** @public **/
+    virtual bool Modify(bool bAlwaysMarkDirty = true) override;
+
 protected:
     /** @protected Search for a free number index **/
     int32 GetFreeIndexNumSlot() const;

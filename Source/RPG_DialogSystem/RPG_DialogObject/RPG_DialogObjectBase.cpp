@@ -156,6 +156,31 @@ void URPG_DialogObjectBase::RemoveNode(const int32 IndexNode)
     }
 }
 
+bool URPG_DialogObjectBase::Modify(bool bAlwaysMarkDirty)
+{
+    bool bSavedToTransactionBuffer = false;
+
+    if (CanModify())
+    {
+        // Do not consider script packages, as they should never end up in the
+        // transaction buffer and we don't want to mark them dirty here either.
+        // We do want to consider PIE objects however
+        if (GetOutermost()->HasAnyPackageFlags(PKG_ContainsScript | PKG_CompiledIn) == false || GetClass()->HasAnyClassFlags(CLASS_DefaultConfig | CLASS_Config))
+        {
+            // If we failed to save to the transaction buffer, but the user requested the package
+            // marked dirty anyway, do so
+            if (!bSavedToTransactionBuffer && bAlwaysMarkDirty)
+            {
+                MarkPackageDirty();
+            }
+        }
+
+        FCoreUObjectDelegates::BroadcastOnObjectModified(this);
+    }
+
+    return bSavedToTransactionBuffer;
+}
+
 int32 URPG_DialogObjectBase::GetFreeIndexNumSlot() const
 {
     for (int32 i = 0; i < INT32_MAX; i++)

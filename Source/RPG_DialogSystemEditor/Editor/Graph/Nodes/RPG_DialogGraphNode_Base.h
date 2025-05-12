@@ -28,6 +28,10 @@ public:
 #pragma region EdGraphNodeInterface
 
 public:
+#if WITH_EDITOR
+
+    virtual bool Modify(bool bAlwaysMarkDirty = true) override;
+#endif
     // UEdGraphNode interface.
     virtual void AllocateDefaultPins() override;
     virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
@@ -71,6 +75,9 @@ public:
 
     /** @public **/
     void AutoConnectionPins(bool bMarkDirty = true) const;
+
+    /** @public **/
+    virtual void ResetNode();
 
 protected:
     /** @protected **/

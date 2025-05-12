@@ -32,6 +32,7 @@ public:
 
 private:
     /** @private **/
+    UPROPERTY(SaveGame)
     int32 NextIDNode{INDEX_NONE};
 
 #pragma endregion

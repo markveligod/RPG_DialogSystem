@@ -17,6 +17,7 @@ class RPG_DIALOGSYSTEM_API URPG_DialogNodeTransfer : public URPG_DialogNodeBase
 #pragma region ActionDialog
 
 public:
+
     /** @public **/
     URPG_DialogNodeTransfer();
 
@@ -32,6 +33,7 @@ public:
 
 private:
     /** @private **/
+    UPROPERTY(SaveGame, EditAnywhere, Category = "Settings", meta = (ClampMin = "-1"))
     int32 NextIDNode{INDEX_NONE};
 
 #pragma endregion

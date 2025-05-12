@@ -21,6 +21,35 @@ void URPG_DialogGraphNode_Base::InitNode(const URPG_DialogNodeBase* InObject)
 
 #pragma region EdGraphNodeInterface
 
+#if WITH_EDITOR
+
+bool URPG_DialogGraphNode_Base::Modify(bool bAlwaysMarkDirty)
+{
+    bool bSavedToTransactionBuffer = false;
+
+    if (CanModify())
+    {
+        // Do not consider script packages, as they should never end up in the
+        // transaction buffer and we don't want to mark them dirty here either.
+        // We do want to consider PIE objects however
+        if (GetOutermost()->HasAnyPackageFlags(PKG_ContainsScript | PKG_CompiledIn) == false || GetClass()->HasAnyClassFlags(CLASS_DefaultConfig | CLASS_Config))
+        {
+            // If we failed to save to the transaction buffer, but the user requested the package
+            // marked dirty anyway, do so
+            if (!bSavedToTransactionBuffer && bAlwaysMarkDirty)
+            {
+                MarkPackageDirty();
+            }
+        }
+
+        FCoreUObjectDelegates::BroadcastOnObjectModified(this);
+    }
+
+    return bSavedToTransactionBuffer;
+}
+
+#endif
+
 void URPG_DialogGraphNode_Base::AllocateDefaultPins()
 {
     Super::AllocateDefaultPins();
@@ -271,6 +300,16 @@ void URPG_DialogGraphNode_Base::AutoConnectionPins(bool bMarkDirty) const
         if (!OtherInputPin) return;
 
         MyPin->MakeLinkTo(OtherInputPin, bMarkDirty);
+    }
+}
+
+void URPG_DialogGraphNode_Base::ResetNode()
+{
+    BreakAllNodeLinks();
+    RemoveOutputPins();
+    if (UEdGraphPin* GraphPin = GetInputPin())
+    {
+        RemovePin(GraphPin);
     }
 }
 

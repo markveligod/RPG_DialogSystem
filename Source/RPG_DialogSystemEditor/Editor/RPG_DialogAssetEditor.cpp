@@ -43,20 +43,12 @@ const FText FDialogEditorTabs::DialogDetailsGraphTitle(FText::FromString(TEXT("D
 
 FRPG_DialogAssetEditor::FRPG_DialogAssetEditor()
 {
-    UEditorEngine* Editor = static_cast<UEditorEngine*>(GEngine);
-    if (Editor != nullptr)
-    {
-        Editor->RegisterForUndo(this);
-    }
+    
 }
 
 FRPG_DialogAssetEditor::~FRPG_DialogAssetEditor()
 {
-    UEditorEngine* Editor = static_cast<UEditorEngine*>(GEngine);
-    if (Editor)
-    {
-        Editor->UnregisterForUndo(this);
-    }
+    
 }
 
 void FRPG_DialogAssetEditor::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
@@ -83,21 +75,6 @@ void FRPG_DialogAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManager>
 
     InTabManager->UnregisterTabSpawner(FDialogEditorTabs::DialogViewportID);
     InTabManager->UnregisterTabSpawner(FDialogEditorTabs::DialogDetailsID);
-}
-
-void FRPG_DialogAssetEditor::PostUndo(bool bSuccess)
-{
-    if (FocusedGraphEditor.IsValid())
-    {
-        FocusedGraphEditor->ClearSelectionSet();
-        FocusedGraphEditor->NotifyGraphChanged();
-        FSlateApplication::Get().DismissAllMenus();
-    }
-}
-
-void FRPG_DialogAssetEditor::PostRedo(bool bSuccess)
-{
-    PostUndo(bSuccess);
 }
 
 FName FRPG_DialogAssetEditor::GetToolkitFName() const
@@ -270,9 +247,10 @@ void FRPG_DialogAssetEditor::DeleteSelectedNodes()
         UEdGraphNode* Node = CastChecked<UEdGraphNode>(*NodeIt);
         if (Node && Node->CanUserDeleteNode())
         {
-            const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
+            URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
             if (!DialogGraphNode) continue;
 
+            DialogGraphNode->ResetNode();
             DialogBeingEdited->RemoveNode(DialogGraphNode->GetTargetIndexNode());
             FBlueprintEditorUtils::RemoveNode(nullptr, Node, true);
         }
