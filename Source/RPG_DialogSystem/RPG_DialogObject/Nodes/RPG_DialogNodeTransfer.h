@@ -17,7 +17,6 @@ class RPG_DIALOGSYSTEM_API URPG_DialogNodeTransfer : public URPG_DialogNodeBase
 #pragma region ActionDialog
 
 public:
-
     /** @public **/
     URPG_DialogNodeTransfer();
 

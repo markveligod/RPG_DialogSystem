@@ -60,34 +60,33 @@ void SDialogGraphNode::UpdateGraphNode()
         SOverlay::Slot()
             .HAlign(HAlign_Fill)
             .VAlign(VAlign_Center)[SNew(SHorizontalBox) +
-                                   SHorizontalBox::Slot().HAlign(
-                                       HAlign_Fill)[SNew(SBorder)
-                                                        .BorderImage(FAppStyle::GetBrush("Graph.Node.ColorSpill"))
-                                                        // The extra margin on the right
-                                                        // is for making the color spill stretch well past the node title
-                                                        .Padding(FMargin(10, 5, 30, 3))
-                                                        .BorderBackgroundColor(this, &SGraphNode::GetNodeTitleColor)
-                                                            [SNew(SHorizontalBox) +
-                                                                SHorizontalBox::Slot()
-                                                                    .VAlign(VAlign_Top)
-                                                                    .Padding(FMargin(0.f, 0.f, 4.f, 0.f))
-                                                                    .AutoWidth()[SNew(SImage).Image(IconBrush).ColorAndOpacity(this, &SGraphNode::GetNodeTitleIconColor)] +
-                                                                SHorizontalBox::Slot()[SNew(SVerticalBox) + SVerticalBox::Slot().AutoHeight()[CreateTitleWidget(NodeTitle)] +
-                                                                                       SVerticalBox::Slot().AutoHeight()[NodeTitle.ToSharedRef()]]]] +
+                                   SHorizontalBox::Slot().HAlign(HAlign_Fill)[SNew(SBorder)
+                                           .BorderImage(FAppStyle::GetBrush("Graph.Node.ColorSpill"))
+                                           // The extra margin on the right
+                                           // is for making the color spill stretch well past the node title
+                                           .Padding(FMargin(10, 5, 30, 3))
+                                           .BorderBackgroundColor(
+                                               this, &SGraphNode::GetNodeTitleColor)[SNew(SHorizontalBox) +
+                                                                                     SHorizontalBox::Slot()
+                                                                                         .VAlign(VAlign_Top)
+                                                                                         .Padding(FMargin(0.f, 0.f, 4.f, 0.f))
+                                                                                         .AutoWidth()[SNew(SImage).Image(IconBrush).ColorAndOpacity(this, &SGraphNode::GetNodeTitleIconColor)] +
+                                                                                     SHorizontalBox::Slot()[SNew(SVerticalBox) + SVerticalBox::Slot().AutoHeight()[CreateTitleWidget(NodeTitle)] +
+                                                                                                            SVerticalBox::Slot().AutoHeight()[NodeTitle.ToSharedRef()]]]] +
                                    SHorizontalBox::Slot().HAlign(HAlign_Right).VAlign(VAlign_Center).Padding(0, 0, 5, 0).AutoWidth()[CreateTitleRightWidget()]] +
         SOverlay::Slot().VAlign(VAlign_Top)[SNew(SBorder)
-                                                .Visibility(EVisibility::HitTestInvisible)
-                                                .BorderImage(FAppStyle::GetBrush("Graph.Node.TitleHighlight"))
-                                                .BorderBackgroundColor(this, &SGraphNode::GetNodeTitleIconColor)[SNew(SSpacer).Size(FVector2D(20, 20))]];
+                .Visibility(EVisibility::HitTestInvisible)
+                .BorderImage(FAppStyle::GetBrush("Graph.Node.TitleHighlight"))
+                .BorderBackgroundColor(this, &SGraphNode::GetNodeTitleIconColor)[SNew(SSpacer).Size(FVector2D(20, 20))]];
 
     SetDefaultTitleAreaWidget(DefaultTitleAreaWidget);
 
     TSharedRef<SWidget> TitleAreaWidget = SNew(SLevelOfDetailBranchNode)
                                               .UseLowDetailSlot(this, &SDialogGraphNode::UseLowDetailNodeTitles)
                                               .LowDetail()[SNew(SBorder)
-                                                               .BorderImage(FAppStyle::GetBrush("Graph.Node.ColorSpill"))
-                                                               .Padding(FMargin(75.0f, 22.0f))  // Saving enough space for a 'typical' title so the transition isn't quite so abrupt
-                                                               .BorderBackgroundColor(this, &SDialogGraphNode::GetNodeTitleColor)]
+                                                      .BorderImage(FAppStyle::GetBrush("Graph.Node.ColorSpill"))
+                                                      .Padding(FMargin(75.0f, 22.0f))  // Saving enough space for a 'typical' title so the transition isn't quite so abrupt
+                                                      .BorderBackgroundColor(this, &SDialogGraphNode::GetNodeTitleColor)]
                                               .HighDetail()[DefaultTitleAreaWidget];
 
     if (!SWidget::GetToolTip().IsValid())
@@ -205,67 +204,35 @@ TSharedRef<SWidget> SDialogGraphNode::CreateNodeContentArea()
                 3))[SNew(SHorizontalBox)
 
                     // ─── LEFT ────────────────────────────────────────────────────────────────────
-                    + SHorizontalBox::Slot().HAlign(HAlign_Left).AutoWidth().MinWidth(15.0f)
-                    [
-                        SAssignNew(LeftNodeBox, SVerticalBox)
-                    ]
+                    + SHorizontalBox::Slot().HAlign(HAlign_Left).AutoWidth().MinWidth(15.0f)[SAssignNew(LeftNodeBox, SVerticalBox)]
 
                     // separator
-                    + SHorizontalBox::Slot().AutoWidth().MinWidth(5.0f)
-                    [
-                        SNew(SSeparator).Orientation(EOrientation::Orient_Vertical).Thickness(2.0f)
-                    ]
+                    + SHorizontalBox::Slot().AutoWidth().MinWidth(5.0f)[SNew(SSeparator).Orientation(EOrientation::Orient_Vertical).Thickness(2.0f)]
 
                     // ─── CENTER ──────────────────────────────────────────────────────────────────
                     + SHorizontalBox::Slot()
                           .HAlign(HAlign_Center)
                           .AutoWidth()
-                          .MinWidth(50.0f)[
-                              SNew(SVerticalBox)
+                          .MinWidth(50.0f)[SNew(SVerticalBox)
                                            // Header для центральной части
-                                           + SVerticalBox::Slot()
-                                            .AutoHeight()
-                                            .Padding(FMargin(5, 0, 5,
-                                                 5))
-                                                 [
-                                                     SNew(STextBlock)
-                                                     .Text(FText::FromString(TEXT("Dialog NPCs:")))
-                                                     .Font(FAppStyle::Get().GetFontStyle("BoldFont"))
-                                                     .Justification(ETextJustify::Center)
-                                                 ]
+                                           + SVerticalBox::Slot().AutoHeight().Padding(FMargin(5, 0, 5,
+                                                 5))[SNew(STextBlock).Text(FText::FromString(TEXT("Dialog NPCs:"))).Font(FAppStyle::Get().GetFontStyle("BoldFont")).Justification(ETextJustify::Center)]
 
                                            // Содержимое центральной части
-                                           + SVerticalBox::Slot().FillHeight(1.0f)
-                                           [
-                                               SAssignNew(CenterNodeBox, SVerticalBox)
-                                               
-                                           ]
-                          ]
+                                           + SVerticalBox::Slot().FillHeight(1.0f)[SAssignNew(CenterNodeBox, SVerticalBox)
+
+        ]]
                     // separator
                     + SHorizontalBox::Slot().AutoWidth().MinWidth(5.0f)[SNew(SSeparator).Orientation(EOrientation::Orient_Vertical).Thickness(2.0f)]
 
                     // ─── RIGHT ───────────────────────────────────────────────────────────────────
-                    + SHorizontalBox::Slot()
-                    .AutoWidth()
-                    .MinWidth(50.0f)
-                    .HAlign(HAlign_Right)[
-                              SNew(SVerticalBox)
+                    + SHorizontalBox::Slot().AutoWidth().MinWidth(50.0f).HAlign(
+                          HAlign_Right)[SNew(SVerticalBox)
                                         // Header для правой части
                                         + SVerticalBox::Slot().AutoHeight().Padding(FMargin(5, 0, 5,
-                                              5))
-                                              [
-                                                  SNew(STextBlock)
-                                                  .Text(FText::FromString(TEXT("Dialog Players:")))
-                                                  .Font(FAppStyle::Get().GetFontStyle("BoldFont"))
-                                                  .Justification(ETextJustify::Center)
-                                              ]
+                                              5))[SNew(STextBlock).Text(FText::FromString(TEXT("Dialog Players:"))).Font(FAppStyle::Get().GetFontStyle("BoldFont")).Justification(ETextJustify::Center)]
                                         // Содержимое правой части
-                                        + SVerticalBox::Slot().FillHeight(1.0f)
-                                        [
-                                            SAssignNew(RightNodeBox, SVerticalBox)
-                                        ]
-                          ]
-                ];
+                                        + SVerticalBox::Slot().FillHeight(1.0f)[SAssignNew(RightNodeBox, SVerticalBox)]]];
     }
     return SGraphNode::CreateNodeContentArea();
 }
@@ -287,66 +254,28 @@ void SDialogGraphNode::UpdateNPCTextData()
         bool bVisibleEvent = DialogNPC->IsHaveSomeEvent();
 
         // Prepare the text
-        FText SetupText = FText::FromString(
-            FString::Printf(TEXT("#%i | %s"), i, *DialogNPC->GetText().ToString())
-        );
+        FText SetupText = FText::FromString(FString::Printf(TEXT("#%i | %s"), i, *DialogNPC->GetText().ToString()));
 
-        const FSlateBrush* ConditionImageBrush  = FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconCondition());
+        const FSlateBrush* ConditionImageBrush = FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconCondition());
         const FSlateBrush* EventImageBrush = FRPG_DialogSystemStyle::GetBrush(FRPG_DialogSystemStyle::GetIconEvent());
 
         CenterNodeBox->AddSlot()
-        .AutoHeight()
-        .HAlign(HAlign_Fill)
-        .Padding(3)
-        [
-            SNew(SHorizontalBox)
+            .AutoHeight()
+            .HAlign(HAlign_Fill)
+            .Padding(
+                3)[SNew(SHorizontalBox)
 
-            // Condition icon, fixed size
-            + SHorizontalBox::Slot()
-            .AutoWidth()
-            .VAlign(VAlign_Center)
-            [
-                SNew(SBox)
-                .WidthOverride(16.0f)
-                .HeightOverride(16.0f)
-                [
-                    SNew(SBorder)
-                    .BorderImage(ConditionImageBrush)
-                    .BorderBackgroundColor(FLinearColor(FColor::Cyan))
-                    .Visibility(bVisibleCond ? EVisibility::Visible : EVisibility::Collapsed)
-                ]
-            ]
+                   // Condition icon, fixed size
+                   +
+                   SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)[SNew(SBox).WidthOverride(16.0f).HeightOverride(16.0f)
+                           [SNew(SBorder).BorderImage(ConditionImageBrush).BorderBackgroundColor(FLinearColor(FColor::Cyan)).Visibility(bVisibleCond ? EVisibility::Visible : EVisibility::Collapsed)]]
 
-            // Event icon, fixed size
-            + SHorizontalBox::Slot()
-            .AutoWidth()
-            .VAlign(VAlign_Center)
-            [
-                SNew(SBox)
-                .WidthOverride(16.0f)
-                .HeightOverride(16.0f)
-                [
-                    SNew(SBorder)
-                    .BorderImage(EventImageBrush)
-                    .BorderBackgroundColor(FLinearColor(FColor::Red))
-                    .Visibility(bVisibleEvent ? EVisibility::Visible : EVisibility::Collapsed)
-                ]
-            ]
+                   // Event icon, fixed size
+                   + SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)[SNew(SBox).WidthOverride(16.0f).HeightOverride(
+                         16.0f)[SNew(SBorder).BorderImage(EventImageBrush).BorderBackgroundColor(FLinearColor(FColor::Red)).Visibility(bVisibleEvent ? EVisibility::Visible : EVisibility::Collapsed)]]
 
-            // Text slot, wrapped in a fixed-width box
-            + SHorizontalBox::Slot()
-            .FillWidth(1.0f)
-            .Padding(FMargin(5, 0))
-            [
-                SNew(SBox)
-                .WidthOverride(180.0f)
-                [
-                    SNew(STextBlock)
-                    .Text(SetupText)
-                    .AutoWrapText(true)
-                    .Justification(ETextJustify::Left)
-                ]
-            ]
-        ];
+                   // Text slot, wrapped in a fixed-width box
+                   + SHorizontalBox::Slot().FillWidth(1.0f).Padding(
+                         FMargin(5, 0))[SNew(SBox).WidthOverride(180.0f)[SNew(STextBlock).Text(SetupText).AutoWrapText(true).Justification(ETextJustify::Left)]]];
     }
 }

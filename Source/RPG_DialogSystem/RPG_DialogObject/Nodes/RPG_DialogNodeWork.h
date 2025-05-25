@@ -147,6 +147,9 @@ public:
     void MakeSelectPlayerNode(uint16 SelectIndex);
 
     /** @public  **/
+    void MakeSelectPlayerNode(URPG_DialogPlayer* DialogPlayer);
+
+    /** @public  **/
     TArray<URPG_DialogNPC*> GetNPCDialogs(APlayerController* PlayerController);
 
     /** @public  **/

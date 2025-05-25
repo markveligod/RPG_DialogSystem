@@ -16,6 +16,7 @@ class RPG_DIALOGSYSTEM_API URPG_DialogObjectBase : public UObject
     GENERATED_BODY()
 
     friend class URPG_DialogComponentBase;
+    friend class URPG_DialogWidget;
 
 #pragma region Default
 
@@ -28,35 +29,7 @@ public:
      */
     virtual void Serialize(FArchive& Ar) override;
 
-#pragma endregion
-
-#pragma region NetworkInterface
-
-public:
-    /**
-     * @public Return the space this function should be called. Checks to see if this function should
-     * be called locally, remotely, or simply absorbed under the given conditions
-     *
-     * @param Function function to call
-     * @param Stack stack frame for the function call
-     * @return bitmask representing all callspaces that apply to this UFunction in the given context
-     */
-    virtual int32 GetFunctionCallspace(UFunction* Function, FFrame* Stack) override;
-
-    /**
-     * @public Call the actor's function remotely
-     *
-     * @param1 Function function to call
-     * @param2 Parameters arguments to the function call
-     * @param3 Stack stack frame for the function call
-     */
-    virtual bool CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack) override;
-
-    /** @public Returns properties that are replicated for the lifetime of the actor channel */
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-    /** @public IsSupportedForNetworking means an object can be referenced over the network */
-    virtual bool IsSupportedForNetworking() const override { return true; }
+    virtual UWorld* GetWorld() const override;
 
 #pragma endregion
 
@@ -67,6 +40,9 @@ public:
 public:
     /** @public Node search by index **/
     URPG_DialogNodeBase* FindNodeByIndex(int32 IndexNode);
+
+    /** @public Node search by target Index **/
+    URPG_DialogNodeBase* FindTargetNode();
 
     /** @public Find start node **/
     URPG_DialogNodeBase* FindStartNode();
@@ -100,10 +76,16 @@ protected:
 
 public:
     /** @public Initialization of internal parameters **/
-    virtual bool InitDialog(APlayerController* PlayerController);
+    virtual bool InitDialog(AActor* ActorOwner);
 
-    /** @public Get next dialog settings **/
-    void NextDialog();
+    /** @public  **/
+    virtual void RunDialog();
+
+    /** @public  **/
+    virtual void CompleteDialog();
+
+    /** @public **/
+    virtual void NextDialog();
 
     /** @public **/
     void ResetDialog();
@@ -112,23 +94,17 @@ public:
     const TArray<URPG_DialogNodeBase*>& GetArrayDialogNode() { return ArrayDialogNode; }
 
     /** @public  **/
-    bool IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes);
+    ERPG_DialogObjectState GetDialogState() const { return DialogState; }
 
     /** @public  **/
-    void RemoveIndexNode(int32 IndexNode);
+    AActor* GetOwner() const { return Owner.Get(); }
 
-    /** @public  **/
-    bool IsNetworkUpdate() const { return bNetworkUpdate; }
+protected:
+    /** @protected  **/
+    virtual void UpdateTargetIDNode();
 
-    /** @public  **/
-    void EnableNetworkUpdate() { bNetworkUpdate = true; }
-
-    /** @public  **/
-    void ResetNetworkUpdate() { bNetworkUpdate = false; }
-
-    /** @public  **/
-    UFUNCTION()
-    void OnRep_TargetIDNode();
+    /** @protected  **/
+    void ChangeDialogState(ERPG_DialogObjectState NewState);
 
 #pragma endregion
 
@@ -136,27 +112,29 @@ public:
 
 protected:
     /** @protected Array of dialog nodes **/
-    UPROPERTY(SaveGame, Replicated)
+    UPROPERTY(SaveGame)
     TArray<URPG_DialogNodeBase*> ArrayDialogNode;
 
     /** @protected Owner player controller **/
-    UPROPERTY()
-    APlayerController* OwnerPC{nullptr};
-
-    /** @protected Owner player controller **/
-    UPROPERTY(ReplicatedUsing = OnRep_TargetIDNode)
     int32 TargetIDNode{INDEX_NONE};
 
 private:
     /** @private **/
-    bool bNetworkUpdate{false};
+    TWeakObjectPtr<AActor> Owner{nullptr};
+
+    /** @private **/
+    ERPG_DialogObjectState DialogState{ERPG_DialogObjectState::None};
 
 #pragma endregion
 
 #pragma region Signature
 
-private:
-    FCompleteDialogSignature OnCompleteDialog;
+protected:
+    /** @protected **/
+    void UpdateStateDialog() { OnUpdateDialog.ExecuteIfBound(this); }
+
+    /** @protected **/
+    FUpdateStateDialogSignature OnUpdateDialog;
 
 #pragma endregion
 };

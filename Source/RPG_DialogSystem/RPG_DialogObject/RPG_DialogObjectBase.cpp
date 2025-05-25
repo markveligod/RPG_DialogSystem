@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
+#include "GameFramework/HUD.h"
 #include "RPG_DialogSystem/RPG_DialogObject/Nodes/RPG_DialogNodeBase.h"
-#include "Net/UnrealNetwork.h"
 #include "Nodes/RPG_DialogNodeFinish.h"
 #include "Nodes/RPG_DialogNodeStart.h"
 #include "Nodes/RPG_DialogNodeTransfer.h"
 #include "Nodes/RPG_DialogNodeWork.h"
+#include "RPG_DialogSystem/RPG_Interface/DialogActionInterface.h"
 
 #pragma region Default
 
@@ -29,38 +30,13 @@ void URPG_DialogObjectBase::Serialize(FArchive& Ar)
     Super::Serialize(Ar);
 }
 
-#pragma endregion
-
-#pragma region NetworkInterface
-
-int32 URPG_DialogObjectBase::GetFunctionCallspace(UFunction* Function, FFrame* Stack)
+UWorld* URPG_DialogObjectBase::GetWorld() const
 {
-    if (!OwnerPC && GetWorld()->GetNetMode() == NM_Client)
+    if (Owner.Get())
     {
-        OwnerPC = GetWorld()->GetFirstPlayerController();
+        return Owner->GetWorld();
     }
-    return (OwnerPC ? OwnerPC->GetFunctionCallspace(Function, Stack) : FunctionCallspace::Local);
-}
-
-bool URPG_DialogObjectBase::CallRemoteFunction(UFunction* Function, void* Parms, FOutParmRec* OutParms, FFrame* Stack)
-{
-    if (!OwnerPC && GetWorld()->GetNetMode() == NM_Client)
-    {
-        OwnerPC = GetWorld()->GetFirstPlayerController();
-    }
-    if (!OwnerPC) return false;
-    UNetDriver* NetDriver = OwnerPC->GetNetDriver();
-    if (!NetDriver) return false;
-    NetDriver->ProcessRemoteFunction(OwnerPC, Function, Parms, OutParms, Stack, this);
-    return true;
-}
-
-void URPG_DialogObjectBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    DOREPLIFETIME_CONDITION(URPG_DialogObjectBase, ArrayDialogNode, COND_OwnerOnly);
-    DOREPLIFETIME_CONDITION(URPG_DialogObjectBase, TargetIDNode, COND_OwnerOnly);
+    return UObject::GetWorld();
 }
 
 #pragma endregion
@@ -77,6 +53,12 @@ URPG_DialogNodeBase* URPG_DialogObjectBase::FindNodeByIndex(int32 IndexNode)
         if (DialogNode->GetIndexNode() == IndexNode) return DialogNode;
     }
     return nullptr;
+}
+
+URPG_DialogNodeBase* URPG_DialogObjectBase::FindTargetNode()
+{
+    if (CLOG_DIALOG_SYSTEM(TargetIDNode == INDEX_NONE, "Target id node is not valid")) return nullptr;
+    return FindNodeByIndex(TargetIDNode);
 }
 
 URPG_DialogNodeBase* URPG_DialogObjectBase::FindStartNode()
@@ -197,26 +179,109 @@ int32 URPG_DialogObjectBase::GetFreeIndexNumSlot() const
 
 #pragma endregion
 
-bool URPG_DialogObjectBase::InitDialog(APlayerController* PlayerController)
+bool URPG_DialogObjectBase::InitDialog(AActor* ActorOwner)
 {
+    if (!ActorOwner) return false;
+    Owner = ActorOwner;
+
+    const URPG_DialogNodeBase* StartNode = FindStartNode();
+    if (!StartNode) return false;
+
+    TargetIDNode = StartNode->GetIndexNode();
+    ChangeDialogState(ERPG_DialogObjectState::Init);
     return true;
 }
 
-void URPG_DialogObjectBase::NextDialog() {}
+void URPG_DialogObjectBase::RunDialog()
+{
+    ChangeDialogState(ERPG_DialogObjectState::Run);
+    NextDialog();
+    UpdateTargetIDNode();
+}
+
+void URPG_DialogObjectBase::CompleteDialog()
+{
+    ChangeDialogState(ERPG_DialogObjectState::Finish);
+    UpdateTargetIDNode();
+}
+
+void URPG_DialogObjectBase::NextDialog()
+{
+    if (CLOG_DIALOG_SYSTEM(GetWorld() == nullptr, "World is nullptr")) return;
+
+    URPG_DialogNodeBase* FindNode = FindNodeByIndex(TargetIDNode);
+    if (CLOG_DIALOG_SYSTEM(FindNode == nullptr, "Dialog node is nullptr")) return;
+    int32 NextID = FindNode->GetNextIDNode();
+    if (CLOG_DIALOG_SYSTEM(NextID == INDEX_NONE, "Next ID node is not valid")) return;
+
+    URPG_DialogNodeBase* FindNextNode = FindNodeByIndex(NextID);
+    if (CLOG_DIALOG_SYSTEM(FindNextNode == nullptr, "Next dialog node is nullptr")) return;
+
+    if (FindNextNode->GetTypeDialogNode() == ERPG_TypeDialogNode::Transfer)
+    {
+        TargetIDNode = FindNextNode->GetIndexNode();
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::NextDialog);
+        return;
+    }
+    if (FindNextNode->GetTypeDialogNode() == ERPG_TypeDialogNode::Finish)
+    {
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::CompleteDialog);
+        return;
+    }
+    if (FindNextNode->GetTypeDialogNode() == ERPG_TypeDialogNode::Start)
+    {
+        TargetIDNode = FindNextNode->GetIndexNode();
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::NextDialog);
+        return;
+    }
+    if (FindNextNode->GetTypeDialogNode() == ERPG_TypeDialogNode::Work)
+    {
+        TargetIDNode = FindNextNode->GetIndexNode();
+        FindNextNode->InitNode();
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::UpdateStateDialog);
+    }
+}
 
 void URPG_DialogObjectBase::ResetDialog()
 {
     TargetIDNode = INDEX_NONE;
-    OwnerPC = nullptr;
+    ChangeDialogState(ERPG_DialogObjectState::None);
 }
 
-bool URPG_DialogObjectBase::IsSomeHaveOutPlayerNode(const TArray<int32>& OutNodes)
+void URPG_DialogObjectBase::UpdateTargetIDNode()
 {
-    return false;
+    if (CLOG_DIALOG_SYSTEM(GetWorld() == nullptr, "World is nullptr")) return;
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (CLOG_DIALOG_SYSTEM(PC == nullptr, "PC is nullptr")) return;
+    AHUD* HUD = PC->GetHUD();
+    if (CLOG_DIALOG_SYSTEM(HUD == nullptr, "HUD is nullptr")) return;
+
+    if (HUD && HUD->Implements<UDialogActionInterface>())
+    {
+        AActor* LOwner = GetOwner();
+        if (DialogState == ERPG_DialogObjectState::Run)
+        {
+            IDialogActionInterface::Execute_RunDialog(HUD, LOwner);
+        }
+        if (DialogState == ERPG_DialogObjectState::Finish)
+        {
+            IDialogActionInterface::Execute_CompleteDialog(HUD, LOwner);
+        }
+    }
+
+    GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::UpdateStateDialog);
 }
 
-void URPG_DialogObjectBase::RemoveIndexNode(int32 IndexNode) {}
+void URPG_DialogObjectBase::ChangeDialogState(ERPG_DialogObjectState NewState)
+{
+    if (CLOG_DIALOG_SYSTEM(NewState == DialogState, "Dialog state is equal with new state : %s", *UEnum::GetValueAsString(NewState))) return;
+    DialogState = NewState;
+    LOG_DIALOG_SYSTEM(Display, "Dialog state changed: %s | Owner: %s", *UEnum::GetValueAsString(DialogState), *GetNameSafe(Owner.Get()));
 
-void URPG_DialogObjectBase::OnRep_TargetIDNode() {}
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::UpdateStateDialog);
+    }
+}
 
 #pragma endregion

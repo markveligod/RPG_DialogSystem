@@ -8,7 +8,8 @@
 #include "RPG_DialogComponentBase.generated.h"
 
 class URPG_DialogObjectBase;
-UCLASS(ClassGroup = (Managers))
+UCLASS(ClassGroup = (Managers), meta = (BlueprintSpawnableComponent),
+    HideCategories = ("Variable", "Sockets", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "Events", "AssetUserData", "Replication", "Navigation"))
 class RPG_DIALOGSYSTEM_API URPG_DialogComponentBase : public UActorComponent
 {
     GENERATED_BODY()
@@ -18,11 +19,6 @@ class RPG_DIALOGSYSTEM_API URPG_DialogComponentBase : public UActorComponent
 public:
     // Sets default values for this component's properties
     URPG_DialogComponentBase();
-
-    // Called every frame
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
     // Called when the game starts
@@ -34,24 +30,17 @@ protected:
 
 public:
     /** @public  **/
-    UFUNCTION(BlueprintCallable)
-    void RunDialog(const TSoftObjectPtr<URPG_DialogObjectBase>& DialogObject);
+    void RunDialog();
 
     /** @public  **/
-    UFUNCTION(BlueprintCallable)
     URPG_DialogObjectBase* GetTargetDialog() const { return TargetDialog; }
 
-    /** @public  **/
-    UFUNCTION()
-    void OnRep_TargetDialog();
+protected:
+    /** @protected **/
+    virtual void RunDialog_Internal();
 
-private:
-    /** @private **/
-    UFUNCTION(Server, Reliable, WithValidation)
-    void ServerRunDialog(const FString& ObjectPath);
-
-    /** @private **/
-    void RegisterCompleteObject(URPG_DialogObjectBase* DialogObject);
+    /** @protected **/
+    virtual void RegisterUpdateDialogObject(URPG_DialogObjectBase* DialogObject);
 
 #pragma endregion
 
@@ -59,16 +48,31 @@ private:
 
 private:
     /** @private **/
-    UPROPERTY(ReplicatedUsing = OnRep_TargetDialog)
-    URPG_DialogObjectBase* TargetDialog{nullptr};
+    UPROPERTY(EditAnywhere, Category = "Dialog Settings")
+    TObjectPtr<URPG_DialogObjectBase> TargetDialog;
 
 #pragma endregion
 
 #pragma region Signature
 
+public:
+    /** @public **/
+    template <typename UserClass>
+    FDelegateHandle SignUpdateTargetDialog(UserClass* Object, void (UserClass::*Method)(URPG_DialogComponentBase*))
+    {
+        static_assert(TIsDerivedFrom<UserClass, UObject>::IsDerived, "SignUpdateTargetDialog<UserClass>: UserClass must be a UObject");
+        return OnUpdateTargetDialog.AddUObject(Object, Method);
+    }
+
+    /** @public **/
+    void UnSignUpdateTargetDialog(const FDelegateHandle& Handle) { OnUpdateTargetDialog.Remove(Handle); }
+
 protected:
-    /** @private **/
+    /** @protected **/
     virtual void NotifyUpdateTargetDialog();
+
+    /** @protected **/
+    FUpdateTargetDialogSignature OnUpdateTargetDialog;
 
 #pragma endregion
 };

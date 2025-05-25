@@ -41,15 +41,9 @@ const FName FDialogEditorTabs::DialogDetailsTabSlateIcon(TEXT("LevelEditor.Tabs.
 const FText FDialogEditorTabs::DialogViewportGraphTitle(FText::FromString(TEXT("DialogGraph")));
 const FText FDialogEditorTabs::DialogDetailsGraphTitle(FText::FromString(TEXT("DialogDetails")));
 
-FRPG_DialogAssetEditor::FRPG_DialogAssetEditor()
-{
-    
-}
+FRPG_DialogAssetEditor::FRPG_DialogAssetEditor() {}
 
-FRPG_DialogAssetEditor::~FRPG_DialogAssetEditor()
-{
-    
-}
+FRPG_DialogAssetEditor::~FRPG_DialogAssetEditor() {}
 
 void FRPG_DialogAssetEditor::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
 {
@@ -145,12 +139,12 @@ void FRPG_DialogAssetEditor::InitDialogEditor(const EToolkitMode::Type Mode, con
     const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout =
         FTabManager::NewLayout("Standalone_DialogEditor_Layout_v3")
             ->AddArea(FTabManager::NewPrimaryArea()
-                          ->SetOrientation(Orient_Vertical)
-                          ->Split(FTabManager::NewSplitter()
-                                      ->SetOrientation(Orient_Horizontal)
-                                      ->SetSizeCoefficient(0.9f)
-                                      ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.40f)->AddTab(FDialogEditorTabs::DialogDetailsID, ETabState::OpenedTab))
-                                      ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.50f)->AddTab(FDialogEditorTabs::DialogViewportID, ETabState::OpenedTab))));
+                    ->SetOrientation(Orient_Vertical)
+                    ->Split(FTabManager::NewSplitter()
+                            ->SetOrientation(Orient_Horizontal)
+                            ->SetSizeCoefficient(0.9f)
+                            ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.40f)->AddTab(FDialogEditorTabs::DialogDetailsID, ETabState::OpenedTab))
+                            ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.50f)->AddTab(FDialogEditorTabs::DialogViewportID, ETabState::OpenedTab))));
 
     // Initialize the asset editor
     InitAssetEditor(Mode, InitToolkitHost, DialogEditorAppName, StandaloneDefaultLayout, true, true, InitDialogObject);

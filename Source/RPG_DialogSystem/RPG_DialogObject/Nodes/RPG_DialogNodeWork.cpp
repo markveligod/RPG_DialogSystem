@@ -115,7 +115,7 @@ URPG_DialogNodeWork::URPG_DialogNodeWork()
 int32 URPG_DialogNodeWork::GetNextIDNode()
 {
     if (CLOG_DIALOG_SYSTEM(ArrayDialogPlayer.Num() == 0, "ArrayDialogPlayer is empty")) return INDEX_NONE;
-    if (CLOG_DIALOG_SYSTEM(ArrayDialogPlayer.IsValidIndex(IndexSelectPlayerNode), "Selected index %i is not valid", IndexSelectPlayerNode)) return INDEX_NONE;
+    if (CLOG_DIALOG_SYSTEM(!ArrayDialogPlayer.IsValidIndex(IndexSelectPlayerNode), "Selected index %i is not valid", IndexSelectPlayerNode)) return INDEX_NONE;
 
     URPG_DialogPlayer* DialogPlayer = ArrayDialogPlayer[IndexSelectPlayerNode];
     if (CLOG_DIALOG_SYSTEM(DialogPlayer == nullptr, "DialogPlayer by index: %i is not valid", IndexSelectPlayerNode)) return INDEX_NONE;
@@ -152,6 +152,11 @@ void URPG_DialogNodeWork::ResetNode()
 void URPG_DialogNodeWork::MakeSelectPlayerNode(uint16 SelectIndex)
 {
     IndexSelectPlayerNode = SelectIndex;
+}
+
+void URPG_DialogNodeWork::MakeSelectPlayerNode(URPG_DialogPlayer* DialogPlayer)
+{
+    MakeSelectPlayerNode(ArrayDialogPlayer.IndexOfByKey(DialogPlayer));
 }
 
 TArray<URPG_DialogNPC*> URPG_DialogNodeWork::GetNPCDialogs(APlayerController* PlayerController)

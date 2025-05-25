@@ -41,9 +41,10 @@ inline bool ClogPrint(bool Cond, TCHAR* NameFunction, const FString& Text)
 #define CLOG_DIALOG_SYSTEM(Cond, Format, ...) DialogSystemSpace::ClogPrint(Cond, ANSI_TO_TCHAR(__FUNCTION__), FString::Printf(TEXT(Format), ##__VA_ARGS__))
 
 class URPG_DialogObjectBase;
+class URPG_DialogComponentBase;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateTargetDialogSignature, URPG_DialogObjectBase*, DialogObject);
-DECLARE_DELEGATE_OneParam(FCompleteDialogSignature, URPG_DialogObjectBase*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FUpdateTargetDialogSignature, URPG_DialogComponentBase*);
+DECLARE_DELEGATE_OneParam(FUpdateStateDialogSignature, URPG_DialogObjectBase*);
 
 UENUM(BlueprintType)
 enum class ERPG_TypeDialogNode : uint8
@@ -53,4 +54,13 @@ enum class ERPG_TypeDialogNode : uint8
     Work,
     Finish,
     Transfer,
+};
+
+UENUM()
+enum class ERPG_DialogObjectState : uint8
+{
+    None = 0,
+    Init,
+    Run,
+    Finish,
 };
