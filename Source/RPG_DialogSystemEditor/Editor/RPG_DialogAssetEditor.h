@@ -9,10 +9,9 @@
 class URPG_DialogGraph;
 class URPG_DialogObjectBase;
 
-class FRPG_DialogAssetEditor : public FAssetEditorToolkit, public FEditorUndoClient, FGCObject
+class FRPG_DialogAssetEditor : public FAssetEditorToolkit, FGCObject
 {
 public:
-    
     FRPG_DialogAssetEditor();
     virtual ~FRPG_DialogAssetEditor();
 
@@ -20,11 +19,6 @@ public:
     virtual void RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager) override;
     virtual void UnregisterTabSpawners(const TSharedRef<FTabManager>& InTabManager) override;
     // End of IToolkit interface
-
-    //~ Begin FEditorUndoClient Interface
-    virtual void PostUndo(bool bSuccess) override;
-    virtual void PostRedo(bool bSuccess) override;
-    // End of FEditorUndoClient
 
     // FAssetEditorToolkit
     virtual FName GetToolkitFName() const override;     // Must implement in derived class!
@@ -58,10 +52,10 @@ protected:
 
     virtual void DeleteSelectedNodes();
     virtual bool CanDeleteNodes() const;
-    
+
 private:
     /** The object we're currently editing */
-    URPG_DialogObjectBase* DialogBeingEdited{nullptr};
+    TObjectPtr<URPG_DialogObjectBase> DialogBeingEdited{nullptr};
     /** Properties tab */
     TSharedPtr<class IDetailsView> DialogProperties;
 

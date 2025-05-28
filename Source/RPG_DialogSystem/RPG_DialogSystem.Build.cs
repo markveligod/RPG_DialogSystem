@@ -12,7 +12,8 @@ public class RPG_DialogSystem : ModuleRules
             // ... add public include paths required here ...
         });
 
-        PrivateIncludePaths.AddRange(new string[] {// ... add other private include paths required here ...
+        PrivateIncludePaths.AddRange(new string[] {
+            // ... add other private include paths required here ...
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {
@@ -21,7 +22,7 @@ public class RPG_DialogSystem : ModuleRules
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "CoreUObject", "Engine", "Slate", "SlateCore",
+            "CoreUObject", "Engine", "Slate", "SlateCore", "UMG", "NetCore"
             // ... add private dependencies that you statically link with here ...
         });
 

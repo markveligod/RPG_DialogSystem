@@ -6,7 +6,7 @@
 #include "Graph/Nodes/RPG_DialogGraphNode_Base.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "RPG_DialogSystem/RPG_DialogObject/RPG_DialogObjectBase.h"
-#include "RPG_DialogSystem/RPG_DialogObject/Condition/RPG_DialogSettingsObject.h"
+#include "RPG_DialogSystem/RPG_DialogObject/Nodes/RPG_DialogNodeBase.h"
 
 #define LOCTEXT_NAMESPACE "DialogAssetEditor"
 
@@ -17,9 +17,9 @@ struct FDialogEditorTabs
     // Tab identifiers
     static const FName DialogDetailsID;
     static const FName DialogViewportID;
-    
+
     static const FText DialogLocalWorkspace;
-    
+
     static const FText DialogViewportTabDisplayName;
     static const FText DialogDetailsTabDisplayName;
 
@@ -41,24 +41,9 @@ const FName FDialogEditorTabs::DialogDetailsTabSlateIcon(TEXT("LevelEditor.Tabs.
 const FText FDialogEditorTabs::DialogViewportGraphTitle(FText::FromString(TEXT("DialogGraph")));
 const FText FDialogEditorTabs::DialogDetailsGraphTitle(FText::FromString(TEXT("DialogDetails")));
 
+FRPG_DialogAssetEditor::FRPG_DialogAssetEditor() {}
 
-FRPG_DialogAssetEditor::FRPG_DialogAssetEditor()
-{
-    UEditorEngine* Editor = static_cast<UEditorEngine*>(GEngine);
-    if (Editor != nullptr)
-    {
-        Editor->RegisterForUndo(this);
-    }
-}
-
-FRPG_DialogAssetEditor::~FRPG_DialogAssetEditor()
-{
-    UEditorEngine* Editor = static_cast<UEditorEngine*>(GEngine);
-    if (Editor)
-    {
-        Editor->UnregisterForUndo(this);
-    }
-}
+FRPG_DialogAssetEditor::~FRPG_DialogAssetEditor() {}
 
 void FRPG_DialogAssetEditor::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
 {
@@ -84,16 +69,6 @@ void FRPG_DialogAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManager>
 
     InTabManager->UnregisterTabSpawner(FDialogEditorTabs::DialogViewportID);
     InTabManager->UnregisterTabSpawner(FDialogEditorTabs::DialogDetailsID);
-}
-
-void FRPG_DialogAssetEditor::PostUndo(bool bSuccess)
-{
-    FEditorUndoClient::PostUndo(bSuccess);
-}
-
-void FRPG_DialogAssetEditor::PostRedo(bool bSuccess)
-{
-    FEditorUndoClient::PostRedo(bSuccess);
 }
 
 FName FRPG_DialogAssetEditor::GetToolkitFName() const
@@ -143,7 +118,7 @@ void FRPG_DialogAssetEditor::AddReferencedObjects(FReferenceCollector& Collector
 
 FString FRPG_DialogAssetEditor::GetReferencerName() const
 {
-    return DialogBeingEdited ? DialogBeingEdited->GetName() : FGCObject::GetReferencerName();
+    return DialogBeingEdited ? DialogBeingEdited->GetName() : TEXT("DialogAssetEditor_ReferencerName");
 }
 
 void FRPG_DialogAssetEditor::BindGraphCommands()
@@ -152,7 +127,6 @@ void FRPG_DialogAssetEditor::BindGraphCommands()
 
     ToolkitCommands->MapAction(
         GenericCommands.Delete, FExecuteAction::CreateSP(this, &FRPG_DialogAssetEditor::DeleteSelectedNodes), FCanExecuteAction::CreateSP(this, &FRPG_DialogAssetEditor::CanDeleteNodes));
-
 }
 
 void FRPG_DialogAssetEditor::InitDialogEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, URPG_DialogObjectBase* InitDialogObject)
@@ -165,12 +139,12 @@ void FRPG_DialogAssetEditor::InitDialogEditor(const EToolkitMode::Type Mode, con
     const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout =
         FTabManager::NewLayout("Standalone_DialogEditor_Layout_v3")
             ->AddArea(FTabManager::NewPrimaryArea()
-                          ->SetOrientation(Orient_Vertical)
-                          ->Split(FTabManager::NewSplitter()
-                                      ->SetOrientation(Orient_Horizontal)
-                                      ->SetSizeCoefficient(0.9f)
-                                      ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.40f)->AddTab(FDialogEditorTabs::DialogDetailsID, ETabState::OpenedTab))
-                                      ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.50f)->AddTab(FDialogEditorTabs::DialogViewportID, ETabState::OpenedTab))));
+                    ->SetOrientation(Orient_Vertical)
+                    ->Split(FTabManager::NewSplitter()
+                            ->SetOrientation(Orient_Horizontal)
+                            ->SetSizeCoefficient(0.9f)
+                            ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.40f)->AddTab(FDialogEditorTabs::DialogDetailsID, ETabState::OpenedTab))
+                            ->Split(FTabManager::NewStack()->SetSizeCoefficient(0.50f)->AddTab(FDialogEditorTabs::DialogViewportID, ETabState::OpenedTab))));
 
     // Initialize the asset editor
     InitAssetEditor(Mode, InitToolkitHost, DialogEditorAppName, StandaloneDefaultLayout, true, true, InitDialogObject);
@@ -240,21 +214,19 @@ void FRPG_DialogAssetEditor::OnSelectedNodesChanged(const TSet<UObject*>& Nodes)
         URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
         if (!DialogGraphNode) continue;
 
-        URPG_DialogSettingsObject* DialogSettingsObject = DialogGraphNode->GetDialogSettingsObject();
-        if (!DialogSettingsObject) continue;
+        URPG_DialogNodeBase* DialogNodeBase = DialogGraphNode->GetOwnerNode();
+        if (!DialogNodeBase) continue;
 
-        if (DialogSettingsObject->TypeStateDialog != ERPG_TypeStateDialog::Entry && DialogSettingsObject->TypeStateDialog != ERPG_TypeStateDialog::None)
+        if (DialogNodeBase->GetTypeDialogNode() == ERPG_TypeDialogNode::Work || DialogNodeBase->GetTypeDialogNode() == ERPG_TypeDialogNode::Transfer)
         {
-            Objects.Add(DialogSettingsObject);
+            Objects.Add(DialogNodeBase);
         }
     }
-    
+
     DialogProperties->SetObjects(Objects);
 }
 
-void FRPG_DialogAssetEditor::OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged)
-{
-}
+void FRPG_DialogAssetEditor::OnNodeTitleCommitted(const FText& NewText, ETextCommit::Type CommitInfo, UEdGraphNode* NodeBeingChanged) {}
 
 void FRPG_DialogAssetEditor::DeleteSelectedNodes()
 {
@@ -269,13 +241,11 @@ void FRPG_DialogAssetEditor::DeleteSelectedNodes()
         UEdGraphNode* Node = CastChecked<UEdGraphNode>(*NodeIt);
         if (Node && Node->CanUserDeleteNode())
         {
-            const URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
+            URPG_DialogGraphNode_Base* DialogGraphNode = Cast<URPG_DialogGraphNode_Base>(Node);
             if (!DialogGraphNode) continue;
 
-            const URPG_DialogSettingsObject* DialogSettingsObject = DialogGraphNode->GetDialogSettingsObject();
-            if (!DialogSettingsObject) continue;
-
-            DialogBeingEdited->RemoveIndexNode(DialogSettingsObject->IndexNode);
+            DialogGraphNode->ResetNode();
+            DialogBeingEdited->RemoveNode(DialogGraphNode->GetTargetIndexNode());
             FBlueprintEditorUtils::RemoveNode(nullptr, Node, true);
         }
     }
@@ -298,10 +268,10 @@ bool FRPG_DialogAssetEditor::CanDeleteNodes() const
         const URPG_DialogGraphNode_Base* Node = Cast<URPG_DialogGraphNode_Base>(*NodeIt);
         if (!Node) continue;
 
-        const URPG_DialogSettingsObject* DialogSettingsObject = Node->GetDialogSettingsObject();
-        if (!DialogSettingsObject) continue;
-        
-        if (DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::Entry || DialogSettingsObject->TypeStateDialog == ERPG_TypeStateDialog::None)
+        const URPG_DialogNodeBase* DialogNodeBase = Node->GetOwnerNode();
+        if (!DialogNodeBase) continue;
+
+        if (DialogNodeBase->GetTypeDialogNode() == ERPG_TypeDialogNode::Start)
         {
             return false;
         }

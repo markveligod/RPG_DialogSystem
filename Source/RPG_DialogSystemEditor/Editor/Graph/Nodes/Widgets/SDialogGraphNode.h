@@ -7,36 +7,22 @@ class RPG_DIALOGSYSTEMEDITOR_API SDialogGraphNode : public SGraphNode
 {
 
 public:
-
     SLATE_BEGIN_ARGS(SDialogGraphNode) {}
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs, URPG_DialogGraphNode_Base* InNode);
 
-
 public:
-
     virtual void UpdateGraphNode() override;
+    virtual void CreateStandardPinWidget(UEdGraphPin* Pin) override;
 
     virtual void UpdateOwnerEditorChange(FPropertyChangedEvent& PropertyChangedEvent);
+    virtual TSharedRef<SWidget> CreateNodeContentArea() override;
 
-    virtual void CreateTextDialogBlock(TSharedPtr<SVerticalBox> MainBox);
-    virtual void CreateConditionIcon(TSharedPtr<SVerticalBox> MainBox);
-    virtual void CreateEventIcon(TSharedPtr<SVerticalBox> MainBox);
 protected:
-
+    void UpdateNPCTextData();
+    TSharedPtr<SVerticalBox> CenterNodeBox;
     URPG_DialogGraphNode_Base* DialogGraphNode{nullptr};
-    
+
 private:
-
-    TSharedPtr<STextBlock> TextSDialog;
-    TSharedPtr<SImage> CondImageSDialog;
-    TSharedPtr<SImage> EventImageSDialog;
-
-    EVisibility GetVisibilityCondition() const;
-    EVisibility GetVisibilityEvent() const;
-
-    FSlateColor GetEventSlateColor() const;
-    FSlateColor GetConditionSlateColor() const;
 };
-

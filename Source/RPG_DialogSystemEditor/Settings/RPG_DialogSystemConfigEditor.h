@@ -8,31 +8,15 @@
 #include "RPG_DialogSystemConfigEditor.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Config = "Game", defaultconfig, meta = (DisplayName = "Dialog System Settings"))
 class RPG_DIALOGSYSTEMEDITOR_API URPG_DialogSystemConfigEditor : public UDeveloperSettings
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-
     URPG_DialogSystemConfigEditor();
-    
-    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
-    TMap<ERPG_TypeStateDialog, FLinearColor> NodeTitleColor;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
-    TMap<ERPG_TypeStateDialog, FLinearColor> NodeCommentColor;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
-    TMap<ERPG_TypeStateDialog, FLinearColor> NodeBodyTintColor;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
-    TMap<ERPG_TypeStateDialog, FString> NodeTitleText;
-
-    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
-    TMap<ERPG_TypeStateDialog, FString> NodeTooltipText;
 
     UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
     FLinearColor SchemeTypePinColor{FLinearColor::White};
@@ -46,4 +30,9 @@ public:
     UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
     FLinearColor IconConditionColor{FColor::Cyan};
 
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    TMap<ERPG_TypeDialogNode, FLinearColor> NodeTitleColors;
+
+    UPROPERTY(Config, EditAnywhere, Category = "Settings Editor")
+    TMap<ERPG_TypeDialogNode, FLinearColor> NodeBodyTintColors;
 };
